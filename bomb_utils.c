@@ -26,20 +26,19 @@
 /* Globals */
 TOUCH_STATE  tsc_state;
 extern GLCD_FONT     GLCD_Font_16x24;
-extern GLCD_FONT     GLCD_customFont_16x24;
 
 Game game;
 
 /*--------------------------------------------------
  *      Initialize game - Jack Dean
- *--------------------------------------------------*/
+ *---------------------------------------- ----------*/
 void game_init(void) 
 {				
 	int x;
 	int y;
 	int randomnumber;		
 	
-	// draw touc screen control areas
+	// draw touch screen control areas
 	drawUI();
 	
 	// iterate through tiles
@@ -60,7 +59,7 @@ void game_init(void)
 			if (x == 0 || x == COLS-1 || y == 0 || y == ROWS-1 || (y%2 == 0 && x%2 == 0))
 			{				
 				tile->type = SOLID;												
-				drawAtCoords(x, y, GLCD_COLOR_BLUE);
+				drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_BLUE);
 			}
 			else if ((y > 2 || x > 2))		// if tile is not adjacent to player start position
 			{
@@ -69,7 +68,8 @@ void game_init(void)
 				if (randomnumber > 6)		// randomly place weak tiles
 				{
 					tile->type = WEAK;
-					drawAtCoords(x, y, GLCD_COLOR_GREEN);
+					drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_GREEN);
+					//drawBitmap(x * TILE_SIZE, y * TILE_SIZE, weak_comp.width, weak_comp.height, weak_comp.rle_pixel_data);
 				}
 				else		// place floor tiles
 				{
@@ -90,7 +90,7 @@ void game_init(void)
 	game.player.y = 1;
 	game.player.tile = &game.tiles[1][1];
 	game.player.tile->hasPlayer = true;
-	drawBitmapCoords(1, 1, Bomberman_Image.pixel_data); // 7/4/16 Player bitmap Chris Hughes
+	drawBitmap(1 * TILE_SIZE, 1 * TILE_SIZE, bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);
 	
 	// initialise bomb level
 	game.bomb.level = 1;
@@ -128,8 +128,7 @@ void placeEnemies(void)
 						game.enemies[i].tile = tile;						
 						tile->enemy = &game.enemies[i];
 						tile->hasEnemy = true;
-						drawBitmapCoords(x, y, Enemy_Image.pixel_data);
-						
+						drawBitmap(x * TILE_SIZE, y * TILE_SIZE, enemy_comp.width, enemy_comp.height, enemy_comp.rle_pixel_data);						
 						placed = true;
 						break;
 					}			
@@ -207,27 +206,30 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 		if (tile->hasBomb)		
 		{	
 			// redraw floor
-			drawAtPixels((tile->x * TILE_SIZE) + (i * xChange), 
+			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
 										 (tile->y * TILE_SIZE) + (i * yChange), 
 											FLOOR_COL);
 			
 			// then redraw bomb
-			drawAtPixels(tile->x * TILE_SIZE, 
+			drawChar(tile->x * TILE_SIZE, 
 										 tile->y * TILE_SIZE, 
 											BOMB_COL);										
 		}
 		else
 		{
 			// redraw floor
-			drawAtPixels((tile->x * TILE_SIZE) + (i * xChange), 
+			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
 										 (tile->y * TILE_SIZE) + (i * yChange), 
 											FLOOR_COL);			
 		}
 		
 		// finally, redraw player
-		drawBitmapPixels((tile->x * TILE_SIZE) + ((i+1) * xChange), 
-										 (tile->y * TILE_SIZE) + ((i+1) * yChange), 
-											Bomberman_Image.pixel_data); //7/4/16 Player Bitmap Chris Hughes
+		drawBitmap((tile->x * TILE_SIZE) + ((i+1) * xChange), 
+										 (tile->y * TILE_SIZE) + ((i+1) * yChange),
+											bomberman_comp.width,
+											bomberman_comp.height,
+											bomberman_comp.rle_pixel_data);
+		
 		// movement speed
 		osDelay(5);	
 	}
@@ -315,13 +317,15 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 	
 	for (i = 0; i < TILE_SIZE; i++)
 	{		
-		drawAtPixels((tile->x * TILE_SIZE) + (i * xChange), 
+		drawChar((tile->x * TILE_SIZE) + (i * xChange), 
 		               (tile->y * TILE_SIZE) + (i * yChange), 
 										FLOOR_COL);
 		
-		drawBitmapPixels((tile->x * TILE_SIZE) + ((i+1) * xChange), 
+		drawBitmap((tile->x * TILE_SIZE) + ((i+1) * xChange), 
 		               (tile->y * TILE_SIZE) + ((i+1) * yChange), 
-										Enemy_Image.pixel_data); //7/4/16 Enemy Bitmap Chris Hughes
+										enemy_comp.width,
+										enemy_comp.height,
+										enemy_comp.rle_pixel_data);		
 		osDelay(15);
 	}
 	
@@ -401,7 +405,8 @@ void dropBomb(void)
 	game.bomb.y = game.player.y;
 	
 	// draw bomb
-	drawAtCoords(game.player.x, game.player.y, GLCD_COLOR_BLACK);	
+	drawChar(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, GLCD_COLOR_BLACK);	
+	//drawBitmap(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);	
 }
 
 /*--------------------------------------------------
@@ -427,7 +432,7 @@ void bombExplode(void)
 	{
 		if (tiles[i]->type != SOLID)
 		{
-			drawAtCoords(tiles[i]->x, tiles[i]->y, GLCD_COLOR_RED);
+			drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_RED);
 			tiles[i]->type = FLOOR;		// change weak tile type to floor
 						
 			if (tiles[i]->hasPlayer)		// check player collision
@@ -448,12 +453,12 @@ void bombExplode(void)
 	osDelay(800);
 	
 	// clear explosions
-	drawAtCoords(game.bomb.x, game.bomb.y, GLCD_COLOR_WHITE);
+	drawChar(game.bomb.x, game.bomb.y, GLCD_COLOR_WHITE);
 	for (i = 0; i < 5; i++)		
 	{
 		if (tiles[i]->type != SOLID)
 		{
-			drawAtCoords(tiles[i]->x, tiles[i]->y, GLCD_COLOR_WHITE);
+			drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_WHITE);
 		}
 	}
 	
@@ -464,39 +469,72 @@ void bombExplode(void)
 }
 
 /*--------------------------------------------------
- *      Draw at coords - Jack Dean
+ *      Draw char - Jack Dean
  *--------------------------------------------------*/
-void drawAtCoords(int x, int y, int color)	
+void drawChar(int x, int y, int color)	
 {	
 	GLCD_SetForegroundColor(color);
-	//GLCD_DrawRectangle((x*TILE_SIZE) + GRID_X, (y*TILE_SIZE) + GRID_Y, TILE_SIZE, TILE_SIZE);		// draws hollow rectangle
-	GLCD_DrawChar((x*TILE_SIZE) + GRID_X, (y*TILE_SIZE) + GRID_Y, 0x81); 													// draws GLCD font
-	//GLCD_DrawBitmap((x*TILE_SIZE) + GRID_X, (y*TILE_SIZE) + GRID_Y, 20, 20, (unsigned char *) &GLCD_customFont_16x24);												// draws bitmap
+	GLCD_DrawChar(x + GRID_X, y + GRID_Y, 0x81);		// draws GLCD ball font
 }
 
 /*--------------------------------------------------
- *      Same as drawAtCoords but bitmap - Chris Hughes
+ *     Draw bitmap at pixels - Chris Hughes, Jack Dean
  *--------------------------------------------------*/
-void drawBitmapCoords(int x, int y, const unsigned char *image)
-{	
-  GLCD_DrawBitmap((x*TILE_SIZE) + GRID_X, (y*TILE_SIZE) + GRID_Y, 18, 18, image);
-}
-
-/*--------------------------------------------------
- *      Draw at pixels (at pixels) - Jack Dean
- *--------------------------------------------------*/
-void drawAtPixels(int x, int y, int color)	
-{	
-	GLCD_SetForegroundColor(color);
-	GLCD_DrawChar(x + GRID_X, y + GRID_Y, 0x81);		// draws GLCD font
-}
-
-/*--------------------------------------------------
- *      Same as drawAtPixels but bitmap - Chris Hughes
- *--------------------------------------------------*/
-void drawBitmapPixels(int x, int y, const unsigned char *image)
+void drawBitmap(int x, int y, int width, int height, const unsigned char *bitmap)
 {
-	GLCD_DrawBitmap(x + GRID_X, y + GRID_Y, 18, 18, image);
+	GLCD_RLE_Bitmap(x + GRID_X, y + GRID_Y, width, height, bitmap);
+}
+
+/*--------------------------------------------------
+ *      RLE draw bitmap - Dr. Mark Fisher
+ *--------------------------------------------------*/
+/**
+  \fn          int32_t GLCD_RLE_DrawBitmap (uint32_t x, uint32_t y, uint32_t width, uint32_t height, const uint8_t *bitmap)
+  \brief       RLE bitmap ( RUN LENGTH ENCODED bitmap without header 16 bits per pixel format)
+  \param[in]   x      Start x position in pixels (0 = left corner)
+  \param[in]   y      Start y position in pixels (0 = upper corner)
+  \param[in]   width  Bitmap width in pixels
+  \param[in]   height Bitmap height in pixels
+  \param[in]   bitmap Bitmap data
+  \returns
+   - \b  0: function succeeded
+   - \b -1: function failed
+*/
+unsigned int GLCD_RLE_Bitmap (unsigned int x, unsigned int y, unsigned int width, unsigned int height, const unsigned char *bitmap) {
+  
+	int32_t npix = width * height;
+	int32_t i=0, j;
+  uint8_t *ptr_bmp, *ptr_buff;
+	uint8_t count;
+  
+  static uint8_t buff[GLCD_WIDTH * GLCD_HEIGHT];
+  ptr_buff = buff;
+	 
+ 	while (i<npix) {
+		count = *bitmap++;
+		ptr_bmp = (unsigned char *) bitmap;
+   
+
+		if (count >= 128) {
+			count = count-128;
+			for (j = 0; j<(count); j++) { /* repeated pixels */
+        ptr_buff[j*2] = *ptr_bmp;
+        ptr_buff[(j*2)+1] = *(ptr_bmp+1);         
+			}
+			bitmap+=2; /* adjust the pointer */
+		}
+		else {
+			for (j=0; j<(count*2); j++) {
+        ptr_buff[j] = ptr_bmp[j];
+      }
+      bitmap+=(count*2); /* adjust the pointer */			
+		}
+    ptr_buff+=(count*2);
+		i+=count;
+	} /* while */
+  
+  GLCD_DrawBitmap(x, y, width, height, buff);
+  return 0;
 }
 
 /*--------------------------------------------------

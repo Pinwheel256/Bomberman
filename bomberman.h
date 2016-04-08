@@ -9,8 +9,8 @@
  *
  * Author: Jack Dean
  *--------------------------------------------------*/
-#ifndef _BOMB_H
-#define _BOMB_H
+#ifndef _BOMBERMAN_H
+#define _BOMBERMAN_H
 
 #include <stdbool.h>
 #include "Board_Touch.h"
@@ -36,7 +36,7 @@
  *--------------------------------------------------*/
 #define GRID_X  130
 #define GRID_Y  0
-#define TILE_SIZE  16
+#define TILE_SIZE  18
 #define ROWS  15
 #define COLS 15
 #define ENEMY_NUM 6
@@ -106,8 +106,6 @@ typedef struct{
  *--------------------------------------------------*/
 void game_init(void);
 void drawUI(void);
-void drawAtCoords(int x, int y, int color);
-void drawAtPixels(int x, int y, int color);
 void placeEnemies(void);
 void movePlayer(int i);
 void updatePlayer(Tile* tile, int xChange, int yChange);
@@ -124,7 +122,8 @@ void clearDisplay(void);
 void update_ball (void);
 void update_player(int);
 void check_collision(void);
-void drawBitmapPixels(int x, int y, const unsigned char *image);
-void drawBitmapCoords(int x, int y, const unsigned char *image);
+void drawChar(int x, int y, int color);
+void drawBitmap(int x, int y, int width, int height, const unsigned char *bitmap);
+extern unsigned int GLCD_RLE_Bitmap (unsigned int x, unsigned int y, unsigned int width, unsigned int height, const unsigned char *bitmap);
 
-#endif /* _BOMB_H */
+#endif /* _BOMBERMAN_H */
