@@ -90,7 +90,7 @@ void game_init(void)
 	game.player.y = 1;
 	game.player.tile = &game.tiles[1][1];
 	game.player.tile->hasPlayer = true;
-	drawIntPlayer(1, 1, Bomberman_Image.pixel_data); // 7/4/16 Player bitmap Chris Hughes
+	drawBitmapCoords(1, 1, Bomberman_Image.pixel_data); // 7/4/16 Player bitmap Chris Hughes
 	
 	// initialise bomb level
 	game.bomb.level = 1;
@@ -128,7 +128,7 @@ void placeEnemies(void)
 						game.enemies[i].tile = tile;						
 						tile->enemy = &game.enemies[i];
 						tile->hasEnemy = true;
-						drawIntPlayer(x, y, Enemy_Image.pixel_data);
+						drawBitmapCoords(x, y, Enemy_Image.pixel_data);
 						
 						placed = true;
 						break;
@@ -225,7 +225,7 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 		}
 		
 		// finally, redraw player
-		drawPlayer((tile->x * TILE_SIZE) + ((i+1) * xChange), 
+		drawBitmapPixels((tile->x * TILE_SIZE) + ((i+1) * xChange), 
 										 (tile->y * TILE_SIZE) + ((i+1) * yChange), 
 											Bomberman_Image.pixel_data); //7/4/16 Player Bitmap Chris Hughes
 		// movement speed
@@ -319,7 +319,7 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 		               (tile->y * TILE_SIZE) + (i * yChange), 
 										FLOOR_COL);
 		
-		drawPlayer((tile->x * TILE_SIZE) + ((i+1) * xChange), 
+		drawBitmapPixels((tile->x * TILE_SIZE) + ((i+1) * xChange), 
 		               (tile->y * TILE_SIZE) + ((i+1) * yChange), 
 										Enemy_Image.pixel_data); //7/4/16 Enemy Bitmap Chris Hughes
 		osDelay(15);
@@ -477,7 +477,7 @@ void drawAtCoords(int x, int y, int color)
 /*--------------------------------------------------
  *      Same as drawAtCoords but bitmap - Chris Hughes
  *--------------------------------------------------*/
-void drawIntPlayer(int x, int y, const unsigned char *image)
+void drawBitmapCoords(int x, int y, const unsigned char *image)
 {	
   GLCD_DrawBitmap((x*TILE_SIZE) + GRID_X, (y*TILE_SIZE) + GRID_Y, 18, 18, image);
 }
@@ -494,7 +494,7 @@ void drawAtPixels(int x, int y, int color)
 /*--------------------------------------------------
  *      Same as drawAtPixels but bitmap - Chris Hughes
  *--------------------------------------------------*/
-void drawPlayer(int x, int y, const unsigned char *image)
+void drawBitmapPixels(int x, int y, const unsigned char *image)
 {
 	GLCD_DrawBitmap(x + GRID_X, y + GRID_Y, 18, 18, image);
 }

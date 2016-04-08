@@ -124,7 +124,7 @@ void clearDisplay(void);
 void update_ball (void);
 void update_player(int);
 void check_collision(void);
-void drawPlayer(int x, int y, const unsigned char *image);
-void drawIntPlayer(int x, int y, const unsigned char *image);
+void drawBitmapPixels(int x, int y, const unsigned char *image);
+void drawBitmapCoords(int x, int y, const unsigned char *image);
 
 #endif /* _BOMB_H */
