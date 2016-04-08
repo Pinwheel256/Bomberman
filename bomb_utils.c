@@ -12,6 +12,7 @@
  *--------------------------------------------------*/
 
 #include "bomberman.h"
+#include "bitmaps.h"
 #include "stm32f7xx_hal.h"
 #include "cmsis_os.h"
 #include "Board_ADC.h"
@@ -21,9 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h> 
 #include <time.h>
-#include "Bomberman_Image.c"
-#include "Enemy.c"
-#include "Bomb.c"
 
 /* Globals */
 TOUCH_STATE  tsc_state;
@@ -403,7 +401,7 @@ void dropBomb(void)
 	game.bomb.y = game.player.y;
 	
 	// draw bomb
-	drawIntPlayer(game.player.x, game.player.y, GLCD_COLOR_BLACK);	
+	drawAtCoords(game.player.x, game.player.y, GLCD_COLOR_BLACK);	
 }
 
 /*--------------------------------------------------
