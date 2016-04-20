@@ -30,13 +30,72 @@ extern GLCD_FONT     GLCD_Font_16x24;
 Game game;
 
 /*--------------------------------------------------
+ *      Show start screen - Jack Dean
+ *---------------------------------------- ----------*/
+void showStartScreen(void) 
+{	
+	// print game info 
+	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
+	GLCD_ClearScreen();
+	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+	GLCD_DrawString (150, 50, "Bomberman");
+	GLCD_DrawString (150, 150, "PRESS to START");
+	
+	// wait for user input
+	while (true)
+	{ 
+		Touch_GetState (&tsc_state);  // get touch state
+		
+		if (tsc_state.pressed)
+		{
+			break;
+		}
+	}
+		
+	game.level = 0;			// init game level
+	showLevelScreen();	
+}
+
+/*--------------------------------------------------
+ *      Show level screen - Jack Dean
+ *---------------------------------------- ----------*/
+void showLevelScreen(void) 
+{	
+	char str[] = "Level ";	
+	char levelStr[2];
+	int level;	
+	
+	// increment level
+	game.level++;
+	
+	// concatenate level number to level info string
+	level = game.level;
+  sprintf(levelStr, "%d", level);
+	strcpy(str, strcat(str, levelStr)); 
+		
+	// print level info
+	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
+	GLCD_ClearScreen();
+	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+	GLCD_DrawString (150, 50, str);
+	GLCD_DrawString (150, 150, "GET READY!");
+	
+	// delay before starting level
+	osDelay(2000);
+	initGame();
+}
+
+/*--------------------------------------------------
  *      Initialize game - Jack Dean
  *---------------------------------------- ----------*/
-void game_init(void) 
-{				
+void initGame(void) 
+{						
 	int x;
 	int y;
 	int randomnumber;		
+		
+	GLCD_SetBackgroundColor(GLCD_COLOR_WHITE);
+  GLCD_ClearScreen(); 
 	
 	// draw touch screen control areas
 	drawUI();
@@ -59,7 +118,6 @@ void game_init(void)
 			if (x == 0 || x == COLS-1 || y == 0 || y == ROWS-1 || (y%2 == 0 && x%2 == 0))
 			{				
 				tile->type = SOLID;												
-				//drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_BLUE);
 				drawBitmap(x * TILE_SIZE, y * TILE_SIZE, solid_comp.width, solid_comp.height, solid_comp.rle_pixel_data);
 			}
 			else if ((y > 2 || x > 2))		// if tile is not adjacent to player start position
@@ -69,7 +127,6 @@ void game_init(void)
 				if (randomnumber > 6)		// randomly place weak tiles
 				{
 					tile->type = WEAK;
-					//drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_GREEN);
 					drawBitmap(x * TILE_SIZE, y * TILE_SIZE, weak_comp.width, weak_comp.height, weak_comp.rle_pixel_data);
 				}
 				else		// place floor tiles
@@ -192,7 +249,7 @@ void movePlayer(int i)
 	{
 		// restart game
 		GLCD_ClearScreen(); 
-		game_init();
+		initGame();
 	}
 	//osDelay(250);	
 }
@@ -209,26 +266,17 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 		if (tile->hasBomb)		
 		{	
 			// redraw floor
-//			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
-//										 (tile->y * TILE_SIZE) + (i * yChange), 
-//											FLOOR_COL);
 			drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
 										(tile->y * TILE_SIZE) + (i * yChange), 
 										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
 			
 			// then redraw bomb
-//			drawChar(tile->x * TILE_SIZE, 
-//										 tile->y * TILE_SIZE, 
-//											BOMB_COL);		
 			drawBitmap(tile->x * TILE_SIZE, tile->y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
 
 		}
 		else
 		{
 			// redraw floor
-//			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
-//										 (tile->y * TILE_SIZE) + (i * yChange), 
-//											FLOOR_COL);	
 			drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
 										(tile->y * TILE_SIZE) + (i * yChange), 
 										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);	
@@ -319,7 +367,7 @@ void moveEnemies(void)
 				{
 					// restart game
 					GLCD_ClearScreen(); 
-					game_init();
+					initGame();
 				}				
 			}		
 		}
@@ -336,9 +384,6 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 	
 	for (i = 0; i < TILE_SIZE; i++)
 	{		
-//		drawChar((tile->x * TILE_SIZE) + (i * xChange), 
-//		               (tile->y * TILE_SIZE) + (i * yChange), 
-//										FLOOR_COL);
 		drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
 										(tile->y * TILE_SIZE) + (i * yChange), 
 										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
@@ -428,7 +473,6 @@ void dropBomb(void)
 	game.bomb.y = game.player.y;
 	
 	// draw bomb
-	//drawChar(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, GLCD_COLOR_BLACK);	
 	drawBitmap(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);	
 }
 
@@ -455,7 +499,6 @@ void bombExplode(void)
 	{
 		if (tiles[i]->type != SOLID)
 		{
-			//drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_RED);
 			drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 
 										explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);
@@ -466,7 +509,7 @@ void bombExplode(void)
 			{					
 				// restart game
 				GLCD_ClearScreen(); 
-				game_init();
+				initGame();
 			}
 			else if (tiles[i]->hasEnemy)		// check enemy collision
 			{
@@ -484,7 +527,6 @@ void bombExplode(void)
 	{
 		if (tiles[i]->type != SOLID)
 		{
-			//drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_WHITE);
 			drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 
 										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);

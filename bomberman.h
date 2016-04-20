@@ -19,6 +19,7 @@
 #include "Board_GLCD.h"
 #include <stdlib.h>
 #include <stdio.h> 
+#include <cstring>
 #include <time.h>
 
 #define wait_delay HAL_Delay
@@ -89,6 +90,7 @@ typedef struct {
 } Bomb;
 
 typedef struct Game {
+	int level;
 	unsigned int num_ticks;		// could be used to control enemy speed
 	Player player;
 	Enemy enemies[ENEMY_NUM];
@@ -104,7 +106,9 @@ typedef struct{
 /*--------------------------------------------------
  *      Function prototypes - Jack Dean
  *--------------------------------------------------*/
-void game_init(void);
+void showStartScreen(void);
+void showLevelScreen(void);
+void initGame(void);
 void drawUI(void);
 void placeEnemies(void);
 void movePlayer(int i);

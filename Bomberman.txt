@@ -59,9 +59,9 @@ updated version to use the 7 day MDK professional evaluation period
 uncommented out code that previously exceeded bytecode limit
 changed all drawChar statements to drawBitmap instead
 restricted enemies from moving onto bomb or other enemies
+added start and level splash screens, WIP
 
 TO DO.
-Add splash screens
 Add door and power up objects.
 Player movement: should player be constrained to tile centres after completing a move?
 Redraw conrol areas into more suitable shapes i.e. hollow circle split into areas.

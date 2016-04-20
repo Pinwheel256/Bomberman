@@ -160,9 +160,10 @@ void startBomb()
  *--------------------------------------------------*/
 void taskA (void const *argument) {
   for (;;) {
-		osSignalWait(0x0001, osWaitForever);
-		osSignalSet(tid_taskB, 1U);
+		osSignalWait(0x0001, osWaitForever);		
+		showStartScreen();
 		osSignalSet(tid_taskC, 1U);
+		osSignalSet(tid_taskB, 1U);		
   }
 }
 
@@ -243,10 +244,9 @@ int main (void) {
   osKernelInitialize();                     /* initialize CMSIS-RTOS          */	
 	Touch_Initialize();                            /* Touchscrn Controller Init */ 
 	GLCD_Initialize();
-  GLCD_SetBackgroundColor (GLCD_COLOR_WHITE);
-  GLCD_ClearScreen(); 
-  GLCD_SetFont(&GLCD_Font_16x24);
-	game_init();
+  //GLCD_SetBackgroundColor (GLCD_COLOR_WHITE);
+  //GLCD_ClearScreen(); 
+  GLCD_SetFont(&GLCD_Font_16x24);	
 
 	/* Initialize RTX variables */
 	mut_GLCD = osMutexCreate(osMutex(mut_GLCD));	
