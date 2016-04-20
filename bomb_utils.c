@@ -279,25 +279,25 @@ void moveEnemies(void)
 				switch (randomnumber)
 				{
 					case 0:
-						if (game.tiles[tile->y][tile->x+1].type == FLOOR)		// check tile moving to is FLOOR tile
+						if ((game.tiles[tile->y][tile->x+1].type == FLOOR) && (!game.tiles[tile->y][tile->x+1].hasBomb) && (!game.tiles[tile->y][tile->x+1].hasEnemy))		// check tile moving to is FLOOR tile
 						{
 							updateEnemy(tile, enemy, 1, 0);																		
 						}												
 						break;
 					case 1:
-						if (game.tiles[tile->y+1][tile->x].type == FLOOR)
+						if ((game.tiles[tile->y+1][tile->x].type == FLOOR) && (!game.tiles[tile->y+1][tile->x].hasBomb) && (!game.tiles[tile->y+1][tile->x].hasEnemy))
 						{
 							updateEnemy(tile, enemy, 0, 1);
 						}
 						break;
 					case 2:
-						if (game.tiles[tile->y][tile->x-1].type == FLOOR)
+						if ((game.tiles[tile->y][tile->x-1].type == FLOOR) && (!game.tiles[tile->y][tile->x-1].hasBomb) && (!game.tiles[tile->y][tile->x-1].hasEnemy))
 						{
 							updateEnemy(tile, enemy, -1, 0);								
 						}
 						break;
 					case 3:
-						if (game.tiles[tile->y-1][tile->x].type == FLOOR)
+						if ((game.tiles[tile->y-1][tile->x].type == FLOOR) && (!game.tiles[tile->y-1][tile->x].hasBomb) && (!game.tiles[tile->y-1][tile->x].hasEnemy))
 						{
 							updateEnemy(tile, enemy, 0, -1);
 						}
