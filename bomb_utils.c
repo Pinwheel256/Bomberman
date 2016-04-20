@@ -59,7 +59,8 @@ void game_init(void)
 			if (x == 0 || x == COLS-1 || y == 0 || y == ROWS-1 || (y%2 == 0 && x%2 == 0))
 			{				
 				tile->type = SOLID;												
-				drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_BLUE);
+				//drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_BLUE);
+				drawBitmap(x * TILE_SIZE, y * TILE_SIZE, solid_comp.width, solid_comp.height, solid_comp.rle_pixel_data);
 			}
 			else if ((y > 2 || x > 2))		// if tile is not adjacent to player start position
 			{
@@ -68,19 +69,21 @@ void game_init(void)
 				if (randomnumber > 6)		// randomly place weak tiles
 				{
 					tile->type = WEAK;
-					drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_GREEN);
-					//drawBitmap(x * TILE_SIZE, y * TILE_SIZE, weak_comp.width, weak_comp.height, weak_comp.rle_pixel_data);
+					//drawChar(x * TILE_SIZE, y * TILE_SIZE, GLCD_COLOR_GREEN);
+					drawBitmap(x * TILE_SIZE, y * TILE_SIZE, weak_comp.width, weak_comp.height, weak_comp.rle_pixel_data);
 				}
 				else		// place floor tiles
 				{
 					tile->type = FLOOR;
 					tile->hasEnemy = false;
+					drawBitmap(x * TILE_SIZE, y * TILE_SIZE, floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
 				}
 			}
 			else		// place floor and weak tiles at player starting position
 			{
 				tile->type = FLOOR;
 				tile->hasEnemy = false;
+				drawBitmap(x * TILE_SIZE, y * TILE_SIZE, floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
 			}
 		}
 	}
@@ -206,21 +209,29 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 		if (tile->hasBomb)		
 		{	
 			// redraw floor
-			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
-										 (tile->y * TILE_SIZE) + (i * yChange), 
-											FLOOR_COL);
+//			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
+//										 (tile->y * TILE_SIZE) + (i * yChange), 
+//											FLOOR_COL);
+			drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
+										(tile->y * TILE_SIZE) + (i * yChange), 
+										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
 			
 			// then redraw bomb
-			drawChar(tile->x * TILE_SIZE, 
-										 tile->y * TILE_SIZE, 
-											BOMB_COL);										
+//			drawChar(tile->x * TILE_SIZE, 
+//										 tile->y * TILE_SIZE, 
+//											BOMB_COL);		
+			drawBitmap(tile->x * TILE_SIZE, tile->y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
+
 		}
 		else
 		{
 			// redraw floor
-			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
-										 (tile->y * TILE_SIZE) + (i * yChange), 
-											FLOOR_COL);			
+//			drawChar((tile->x * TILE_SIZE) + (i * xChange), 
+//										 (tile->y * TILE_SIZE) + (i * yChange), 
+//											FLOOR_COL);	
+			drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
+										(tile->y * TILE_SIZE) + (i * yChange), 
+										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);	
 		}
 		
 		// finally, redraw player
@@ -317,9 +328,13 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 	
 	for (i = 0; i < TILE_SIZE; i++)
 	{		
-		drawChar((tile->x * TILE_SIZE) + (i * xChange), 
-		               (tile->y * TILE_SIZE) + (i * yChange), 
-										FLOOR_COL);
+//		drawChar((tile->x * TILE_SIZE) + (i * xChange), 
+//		               (tile->y * TILE_SIZE) + (i * yChange), 
+//										FLOOR_COL);
+		drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
+										(tile->y * TILE_SIZE) + (i * yChange), 
+										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+
 		
 		drawBitmap((tile->x * TILE_SIZE) + ((i+1) * xChange), 
 		               (tile->y * TILE_SIZE) + ((i+1) * yChange), 
@@ -405,8 +420,8 @@ void dropBomb(void)
 	game.bomb.y = game.player.y;
 	
 	// draw bomb
-	drawChar(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, GLCD_COLOR_BLACK);	
-	//drawBitmap(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);	
+	//drawChar(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, GLCD_COLOR_BLACK);	
+	drawBitmap(game.player.x * TILE_SIZE, game.player.y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);	
 }
 
 /*--------------------------------------------------
@@ -432,7 +447,11 @@ void bombExplode(void)
 	{
 		if (tiles[i]->type != SOLID)
 		{
-			drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_RED);
+			//drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_RED);
+			drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);
+
 			tiles[i]->type = FLOOR;		// change weak tile type to floor
 						
 			if (tiles[i]->hasPlayer)		// check player collision
@@ -453,12 +472,14 @@ void bombExplode(void)
 	osDelay(800);
 	
 	// clear explosions
-	drawChar(game.bomb.x, game.bomb.y, GLCD_COLOR_WHITE);
 	for (i = 0; i < 5; i++)		
 	{
 		if (tiles[i]->type != SOLID)
 		{
-			drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_WHITE);
+			//drawChar(tiles[i]->x * TILE_SIZE, tiles[i]->y * TILE_SIZE, GLCD_COLOR_WHITE);
+			drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
 		}
 	}
 	
