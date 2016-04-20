@@ -56,7 +56,7 @@ cleaned up all draw functions, added Mark's RLE bitmp decode function
 
 20/4/16 - Jack
 updated version to use the 7 day MDK professional evaluation period
-uncommented out code that prevsiously exceeded bytecode limit
+uncommented out code that previously exceeded bytecode limit
 changed all drawChar statements to drawBitmap instead
 restricted enemies from moving onto bomb or other enemies
 
