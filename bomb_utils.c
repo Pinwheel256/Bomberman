@@ -53,7 +53,7 @@ void showStartScreen(void)
 	}
 		
 	game.level = 0;			// init game level
-	showLevelScreen();	
+	showLevelScreen();	// show first level screen
 }
 
 /*--------------------------------------------------
@@ -94,7 +94,7 @@ void initGame(void)
 	int y;
 	int randomnumber;		
 		
-	GLCD_SetBackgroundColor(GLCD_COLOR_WHITE);
+	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
   GLCD_ClearScreen(); 
 	
 	// draw touch screen control areas
@@ -613,12 +613,12 @@ unsigned int GLCD_RLE_Bitmap (unsigned int x, unsigned int y, unsigned int width
  *--------------------------------------------------*/
 void drawUI(void)
 {
-	GLCD_SetForegroundColor (GLCD_COLOR_BLACK);	
+	GLCD_SetForegroundColor (GLCD_COLOR_WHITE);	
 	GLCD_DrawRectangle (90, 110, 30, 60);		// right
 	GLCD_DrawRectangle (30, 160, 60, 30);		// down
 	GLCD_DrawRectangle (0, 110, 30, 60);		// left
 	GLCD_DrawRectangle (30, 90, 60, 30);		// up
-	GLCD_DrawRectangle (390, 110, 40, 40);		// action
+	GLCD_DrawRectangle (410, 110, 40, 40);		// action
 }
 
 /*--------------------------------------------------
