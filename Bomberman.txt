@@ -50,14 +50,20 @@ Created bitmaps for most objects in game
 Updated updatePlayer & game_init
 created methods drawIntPlayer & drawPlayer to mimic drawAtCoords & drawAtPixels respectively
 
+8/4/16 - Jack
+exported all bitmaps as RLE c files
+cleaned up all draw functions, added Mark's RLE bitmp decode function
+
+20/4/16 - Jack
+updated version to use the 7 day MDK professional evaluation period
+uncommented out code that prevsiously exceeded bytecode limit
+changed all drawChar statements to drawBitmap instead
+restricted enemies from moving onto bomb or other enemies
+
 TO DO.
-Handle redrawing when enemies pass over each other or bomb. Already handled with player, use similar function.
-Or, bomb and other enemies block enemy movement. Easier.
-Clean up player and enemy move functions, DRY.
+Add splash screens
 Add door and power up objects.
-Add bitmaps.
-Change movement to move pixel by pixel. Should player be constrained to tile centres after completing a move?
-Make sure bomb drops centred on tile relative to player position.
+Player movement: should player be constrained to tile centres after completing a move?
 Redraw conrol areas into more suitable shapes i.e. hollow circle split into areas.
 Use mutexes and mailbox? Seems to work fine without.
 Malloc and free everything to preserve memory?
@@ -70,7 +76,9 @@ Add points?
 Make multiplayer?
 
 BUGS.
-1. Bomb thread continues after player death and any pending explosions will appear after level reset.
+1. Bomb thread continues after player death and any pending explosions will appear after level reset
+2. Bomb explosions only check for collision once at start of animation
+3. Player move thread continues after game reset. Need pause in between games to restart threads and reset game variables
 
 TESTING.
 
