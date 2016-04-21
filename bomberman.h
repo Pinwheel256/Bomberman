@@ -54,15 +54,17 @@
  *--------------------------------------------------*/
 
 typedef enum {SOLID, WEAK, FLOOR} tile_type;
-typedef enum {EMPTY, PLAYER, BOMB, ENEMY} object_type;
+typedef enum {EMPTY, DOOR, POWERUP} object_type;
 
 typedef struct Enemy Enemy;
 typedef struct Tile Tile;
 
 struct Tile {
-  tile_type type;	
+  tile_type type;
+	object_type object;
   int x;				
-	int y;					
+	int y;		
+	int number;	// not used
 	bool hasPlayer;
 	bool hasEnemy;
 	bool hasBomb;
@@ -91,6 +93,7 @@ typedef struct {
 
 typedef struct Game {
 	int level;
+	object_type object;
 	unsigned int num_ticks;		// could be used to control enemy speed
 	Player player;
 	Enemy enemies[ENEMY_NUM];
@@ -111,6 +114,7 @@ void showLevelScreen(void);
 void initGame(void);
 void drawUI(void);
 void placeEnemies(void);
+void placeObjects(void);
 void movePlayer(int i);
 void updatePlayer(Tile* tile, int xChange, int yChange);
 void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange);

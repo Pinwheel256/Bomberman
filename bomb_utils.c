@@ -81,7 +81,7 @@ void showLevelScreen(void)
 	GLCD_DrawString (150, 150, "GET READY!");
 	
 	// delay before starting level
-	osDelay(2000);
+	//osDelay(2000);
 	initGame();
 }
 
@@ -90,21 +90,23 @@ void showLevelScreen(void)
  *---------------------------------------- ----------*/
 void initGame(void) 
 {						
-	int x;
-	int y;
-	int randomnumber;		
-		
+	int x;								// tile x coord
+	int y;								// tile y coord
+	int tileNum = 0;			// tile number	
+	int randNum;
+	
+	// set game background
 	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
   GLCD_ClearScreen(); 
 	
 	// draw touch screen control areas
 	drawUI();
 	
-	// iterate through tiles
-	for (y = 0; y < ROWS; y++)
+	// initialise and draw game level	
+	for (y = 0; y < ROWS; y++)					// iterate through tiles
 	{
 		for (x = 0; x < COLS; x++)
-		{	
+		{										
 			// initiliase each tile's field values
 			Tile* tile = &game.tiles[y][x];
 			tile->x = x;
@@ -112,7 +114,7 @@ void initGame(void)
 			tile->hasPlayer = false;
 			tile->hasEnemy = false;
 			tile->hasBomb = false;
-			tile->enemy = NULL;	
+			tile->enemy = NULL;								
 			
 			// place solid tiles
 			if (x == 0 || x == COLS-1 || y == 0 || y == ROWS-1 || (y%2 == 0 && x%2 == 0))
@@ -123,8 +125,8 @@ void initGame(void)
 			else if ((y > 2 || x > 2))		// if tile is not adjacent to player start position
 			{
 				//srand((unsigned)time(NULL));	// needed to be truly random but crashes program..?
-				randomnumber = rand() % 10;		
-				if (randomnumber > 6)		// randomly place weak tiles
+				randNum = rand() % 10;		
+				if (randNum > 6)		// randomly place weak tiles
 				{
 					tile->type = WEAK;
 					drawBitmap(x * TILE_SIZE, y * TILE_SIZE, weak_comp.width, weak_comp.height, weak_comp.rle_pixel_data);
@@ -142,8 +144,11 @@ void initGame(void)
 				tile->hasEnemy = false;
 				drawBitmap(x * TILE_SIZE, y * TILE_SIZE, floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
 			}
+			
+			// keep track of tile number
+			tileNum++;
 		}
-	}
+	}			
 	
 	// place player
 	game.player.x = 1;
@@ -155,7 +160,8 @@ void initGame(void)
 	// initialise bomb level
 	game.bomb.level = 1;
 	
-	placeEnemies();	
+	placeEnemies();
+	placeObjects();
 }
 
 /*--------------------------------------------------
@@ -166,46 +172,79 @@ void placeEnemies(void)
 	int i;
 	int y;
 	int x;
-	int randomnumber;
-	bool placed;
+	int randNum;
+	Tile* tile;
 	
-	for (i = 0; i < 6; i++)		// for each enemy
+	// variables for RNG 
+	int pool[225];				// pool of possible tile numbers
+	int poolSize = 225;		// pool size
+
+	// init pool
+	for (i = 0; i < 225; i++)
 	{
-		placed = false;
-		for (y = 5; y < ROWS; y++)		// iterate through tiles
+		pool[i] = i;
+	}
+	
+	// store enemy tile locations (Fisher-Yates Shuffle algorithm)																			
+	for (i = 0; i < 6; i++)
+	{		
+		// get random tile
+		do 
 		{
-			for (x = 0; x < COLS; x++)
-			{
-				Tile* tile = &game.tiles[y][x];			
-				
-				if (tile->type == FLOOR && tile->hasEnemy == false)
-				{
-					randomnumber = rand() % 255;
-					if (randomnumber < 25)
-					{
-						// set enemy fields
-						game.enemies[i].alive = true;
-						game.enemies[i].tile = tile;						
-						tile->enemy = &game.enemies[i];
-						tile->hasEnemy = true;
-						drawBitmap(x * TILE_SIZE, y * TILE_SIZE, enemy_comp.width, enemy_comp.height, enemy_comp.rle_pixel_data);						
-						placed = true;
-						break;
-					}			
-				}		
-			}
-			if (placed == true)
-			{
-				break;
-			}
+			randNum = pool[rand() % poolSize];
+			y = randNum / 15;
+			x = randNum % 15;
+			tile = &game.tiles[y][x];
 		}
-		if (placed != true)
-		{
-			game.enemies[i].alive = false;
-			game.enemies[i].tile = NULL;
-		}
+		while ((tile->type != FLOOR) || (tile->y < 5));		// ensures floor tile and distance from player
+		
+		game.enemies[i].alive = true;
+		game.enemies[i].tile = tile;						
+		tile->enemy = &game.enemies[i];
+		tile->hasEnemy = true;		
+		drawBitmap(x * TILE_SIZE, y * TILE_SIZE, enemy_comp.width, enemy_comp.height, enemy_comp.rle_pixel_data);			
+		
+		// shuffle pool
+		poolSize--;
+		pool[randNum] = pool[poolSize];
 	}	
 }
+
+/*--------------------------------------------------
+ *      Place objects - Jack Dean
+ *--------------------------------------------------*/
+void placeObjects(void)
+{
+	int y;
+	int x;
+	int randNum;
+	Tile* tile;
+	
+	// place door
+	do 
+	{
+		randNum = rand() % (ROWS * COLS);
+		y = randNum / 15;
+		x = randNum % 15;
+		tile = &game.tiles[y][x];
+	}
+	while (tile->type != WEAK);		// ensures weak tile
+								
+	tile->object = DOOR;			
+		
+	// place powerup
+	do 
+	{
+		randNum = rand() % (ROWS * COLS);
+		y = randNum / 15;
+		x = randNum % 15;
+		tile = &game.tiles[y][x];
+	}
+	while (tile->type != WEAK && tile->object != DOOR);	// ensures weak and not door
+								
+	tile->object = POWERUP;		
+	//game.tiles[1][3].object = POWERUP;
+}	
 
 /*--------------------------------------------------
  *      Move player - Jack Dean
@@ -499,11 +538,10 @@ void bombExplode(void)
 	{
 		if (tiles[i]->type != SOLID)
 		{
+			// draw explosion
 			drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 
-										explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);
-
-			tiles[i]->type = FLOOR;		// change weak tile type to floor
+										explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);								
 						
 			if (tiles[i]->hasPlayer)		// check player collision
 			{					
@@ -527,9 +565,36 @@ void bombExplode(void)
 	{
 		if (tiles[i]->type != SOLID)
 		{
-			drawBitmap(tiles[i]->x * TILE_SIZE, 
+			if (tiles[i]->type == FLOOR)
+			{
+				drawBitmap(tiles[i]->x * TILE_SIZE, 
+											tiles[i]->y * TILE_SIZE, 
+											floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+			}
+			else if (tiles[i]->type == WEAK)
+			{
+				tiles[i]->type = FLOOR;		// change type to floor				
+				
+				// draw hidden objects
+				if (tiles[i]->object == DOOR)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);										
+				}
+				else if (tiles[i]->object == POWERUP)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 										
+										bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
+				}
+				else
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 
 										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+				}
+			}												
 		}
 	}
 	
