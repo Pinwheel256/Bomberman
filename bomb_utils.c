@@ -157,9 +157,7 @@ void initGame(void)
 	game.player.tile->hasPlayer = true;
 	drawBitmap(1 * TILE_SIZE, 1 * TILE_SIZE, bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);
 	
-	// initialise bomb level
-	game.bomb.level = 1;
-	
+	game.bomb.power = 3;	// initialise bomb level
 	placeEnemies();
 	placeObjects();
 }
@@ -283,6 +281,18 @@ void movePlayer(int i)
 			break;
 	}
 	
+	// check for object
+	if (game.player.tile->object == DOOR)
+	{
+		// restart game
+		GLCD_ClearScreen(); 
+		initGame();
+	}
+	else if (game.player.tile->object == POWERUP)
+	{
+		game.bomb.power++;
+	}
+	
 	// check player collision with enemies
 	if (game.player.tile->hasEnemy == true)
 	{
@@ -368,7 +378,8 @@ void moveEnemies(void)
 					case 0:
 						if ((game.tiles[tile->y][tile->x+1].type == FLOOR) && 
 							 (!game.tiles[tile->y][tile->x+1].hasBomb) && 
-						   (!game.tiles[tile->y][tile->x+1].hasEnemy))		// check tile is empty
+						   (!game.tiles[tile->y][tile->x+1].hasEnemy) &&
+							 (game.tiles[tile->y][tile->x+1].object == EMPTY)) // check tile is empty
 						{
 							updateEnemy(tile, enemy, 1, 0);																		
 						}												
@@ -376,7 +387,8 @@ void moveEnemies(void)
 					case 1:
 						if ((game.tiles[tile->y+1][tile->x].type == FLOOR) && 
 							 (!game.tiles[tile->y+1][tile->x].hasBomb) && 
-						   (!game.tiles[tile->y+1][tile->x].hasEnemy))
+						   (!game.tiles[tile->y+1][tile->x].hasEnemy) &&
+							 (game.tiles[tile->y+1][tile->x].object == EMPTY)) // check tile is empty
 						{
 							updateEnemy(tile, enemy, 0, 1);
 						}
@@ -384,7 +396,8 @@ void moveEnemies(void)
 					case 2:
 						if ((game.tiles[tile->y][tile->x-1].type == FLOOR) && 
 							 (!game.tiles[tile->y][tile->x-1].hasBomb) && 
-						   (!game.tiles[tile->y][tile->x-1].hasEnemy))
+						   (!game.tiles[tile->y][tile->x-1].hasEnemy) &&
+							 (game.tiles[tile->y][tile->x-1].object == EMPTY)) // check tile is empty
 						{
 							updateEnemy(tile, enemy, -1, 0);								
 						}
@@ -392,7 +405,8 @@ void moveEnemies(void)
 					case 3:
 						if ((game.tiles[tile->y-1][tile->x].type == FLOOR) && 
 							 (!game.tiles[tile->y-1][tile->x].hasBomb) && 
-						   (!game.tiles[tile->y-1][tile->x].hasEnemy))
+						   (!game.tiles[tile->y-1][tile->x].hasEnemy) &&
+							 (game.tiles[tile->y-1][tile->x].object == EMPTY)) // check tile is empty
 						{
 							updateEnemy(tile, enemy, 0, -1);
 						}
@@ -521,81 +535,103 @@ void dropBomb(void)
 void bombExplode(void)
 {
 	int i;
-	int x = game.bomb.x;
-	int y = game.bomb.y;	
+	int bombX = game.bomb.x;
+	int bombY = game.bomb.y;	
+	Tile* tiles[20];												   // store vulnerable tiles in array
+	int directions[4][2] = {{0, +1}, {+1, 0},  // hardcode explosion directions
+												{0, -1}, {-1, 0}};
+	int dirIndex = 0;
+	int offset = 1;			// distance from centre tile
+	int numTiles = 0;
 	
-	// temp store bomb tile and adjacent tiles
-	Tile* tiles[5];
+	// add centre tile
 	tiles[0] = game.bomb.tile;
-	tiles[1] = &game.tiles[y][x+1];		
-	tiles[2] = &game.tiles[y+1][x];
-	tiles[3] = &game.tiles[y][x]-1;
-	tiles[4] = &game.tiles[y-1][x];	
+	numTiles++;
 	
-	game.bomb.tile->hasBomb = false;
-	
-	for (i = 0; i < 5; i++)		// process explosions
-	{
-		if (tiles[i]->type != SOLID)
+	// add vulnerable tiles for each direction
+	for (i = 1; dirIndex < 4; i++)
+	{			
+		// temp store tile
+		Tile* tile = &game.tiles[bombY + (offset * directions[dirIndex][0])]
+														[bombX + (offset * directions[dirIndex][1])];
+		
+		// check tile is vulnerable and within reach
+		if (tile->type != SOLID && offset <= game.bomb.power)
+		{			
+			// add tile
+			tiles[i] = tile;
+			offset++;
+			numTiles++;
+		}
+		else
 		{
-			// draw explosion
-			drawBitmap(tiles[i]->x * TILE_SIZE, 
-										tiles[i]->y * TILE_SIZE, 
-										explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);								
-						
-			if (tiles[i]->hasPlayer)		// check player collision
-			{					
-				// restart game
-				GLCD_ClearScreen(); 
-				initGame();
-			}
-			else if (tiles[i]->hasEnemy)		// check enemy collision
-			{
-				tiles[i]->enemy->alive = false;			  // remove enemy from game
-				tiles[i]->enemy->tile->hasEnemy = false;
-				tiles[i]->enemy->tile->enemy = NULL;
-			}
+			offset = 1;		// reset offset 
+			dirIndex++;		// use next set of coords
+			i--;					// tile not initialised so reuse same index
+		}		
+	}
+	
+	// remove bomb
+	game.bomb.tile->hasBomb = false;	
+	
+	// process explosions
+	for (i = 0; i < numTiles; i++)
+	{
+		// draw explosion
+		drawBitmap(tiles[i]->x * TILE_SIZE, 
+									tiles[i]->y * TILE_SIZE, 
+									explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);								
+					
+		if (tiles[i]->hasPlayer)		// check player collision
+		{					
+			// restart game
+			GLCD_ClearScreen(); 
+			initGame();
+		}
+		else if (tiles[i]->hasEnemy)		// check enemy collision
+		{
+			// kill enemy
+			tiles[i]->enemy->alive = false;			  
+			tiles[i]->enemy->tile->hasEnemy = false;
+			tiles[i]->enemy->tile->enemy = NULL;
 		}
 	}		
  
 	osDelay(800);
 	
 	// clear explosions
-	for (i = 0; i < 5; i++)		
+	for (i = 0; i < numTiles; i++)		
 	{
-		if (tiles[i]->type != SOLID)
+		if (tiles[i]->type == FLOOR)
 		{
-			if (tiles[i]->type == FLOOR)
-			{
-				drawBitmap(tiles[i]->x * TILE_SIZE, 
-											tiles[i]->y * TILE_SIZE, 
-											floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
-			}
-			else if (tiles[i]->type == WEAK)
-			{
-				tiles[i]->type = FLOOR;		// change type to floor				
-				
-				// draw hidden objects
-				if (tiles[i]->object == DOOR)
-				{
-					drawBitmap(tiles[i]->x * TILE_SIZE, 
-										tiles[i]->y * TILE_SIZE, 
-										bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);										
-				}
-				else if (tiles[i]->object == POWERUP)
-				{
-					drawBitmap(tiles[i]->x * TILE_SIZE, 
-										tiles[i]->y * TILE_SIZE, 										
-										bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
-				}
-				else
-				{
-					drawBitmap(tiles[i]->x * TILE_SIZE, 
+			drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 
 										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
-				}
-			}												
 		}
+		else if (tiles[i]->type == WEAK)
+		{
+			tiles[i]->type = FLOOR;		// change type to floor				
+			
+			// draw hidden objects
+			if (tiles[i]->object == DOOR)
+			{
+				drawBitmap(tiles[i]->x * TILE_SIZE, 
+									tiles[i]->y * TILE_SIZE, 
+									bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);										
+			}
+			else if (tiles[i]->object == POWERUP)
+			{
+				drawBitmap(tiles[i]->x * TILE_SIZE, 
+									tiles[i]->y * TILE_SIZE, 										
+									bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
+			}
+			else
+			{
+				drawBitmap(tiles[i]->x * TILE_SIZE, 
+									tiles[i]->y * TILE_SIZE, 
+									floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+			}
+		}												
 	}
 	
 	// reset bomb

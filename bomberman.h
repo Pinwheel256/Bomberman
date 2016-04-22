@@ -88,7 +88,7 @@ typedef struct {
 	int x;
 	int y;
   Tile* tile;
-	int level;
+	int power;
 } Bomb;
 
 typedef struct Game {
