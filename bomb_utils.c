@@ -38,8 +38,12 @@ void showStartScreen(void)
 	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
 	GLCD_ClearScreen();
 	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
-	GLCD_DrawString (150, 50, "Bomberman");
-	GLCD_DrawString (150, 150, "PRESS to START");
+	GLCD_DrawString (170, 50, "Bomberman");
+	drawBitmap(90 , 100,
+											pxbomberman.width,
+											pxbomberman.height,
+											pxbomberman.rle_pixel_data);
+	GLCD_DrawString (125, 150, "PRESS to START");
 	
 	// wait for user input
 	while (true)
@@ -602,16 +606,9 @@ void bombExplode(void)
 	// clear explosions
 	for (i = 0; i < numTiles; i++)		
 	{
-		if (tiles[i]->type == FLOOR)
-		{
-			drawBitmap(tiles[i]->x * TILE_SIZE, 
-										tiles[i]->y * TILE_SIZE, 
-										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
-		}
-		else if (tiles[i]->type == WEAK)
-		{
-			tiles[i]->type = FLOOR;		// change type to floor				
-			
+			if (tiles[i]->type == WEAK)
+								tiles[i]->type = FLOOR;		// change type to floor				
+		
 			// draw hidden objects
 			if (tiles[i]->object == DOOR)
 			{
@@ -630,8 +627,7 @@ void bombExplode(void)
 				drawBitmap(tiles[i]->x * TILE_SIZE, 
 									tiles[i]->y * TILE_SIZE, 
 									floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
-			}
-		}												
+			}										
 	}
 	
 	// reset bomb
