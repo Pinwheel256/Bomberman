@@ -64,7 +64,7 @@ added start and level splash screens, WIP
 21/4/16 - Jack
 changed enemy placement to use Fisher-Yates Shuffle algorithm
 added placeObjects function to place door and powerup objects
-updated explosion funtion to draw door and powerup if hidden
+updated explosion function to draw door and powerup if hidden
 
 22/4/16 - Jack
 added functionality to powerup pickup
@@ -73,6 +73,8 @@ updated bombExplode to take into account bomb power
 23/4/16 - Chris
 added bitmaps for the door and power up
 updated functions in bomb_utils to draw the bitmaps
+added large bomberman bitmap to splash screen & moved text slightly
+updated explosion function to draw door/powerup if they were already revealed
 
 23/4/16 - Jack
 cleaned up initGame and initStage functions
