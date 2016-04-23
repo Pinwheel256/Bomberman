@@ -51,8 +51,8 @@ void showStartScreen(void)
 			break;
 		}
 	}
-		
-	game.level = 0;			// init game level
+	
+	game.stage = 0;			// init game level
 	showLevelScreen();	// show first level screen
 }
 
@@ -66,10 +66,10 @@ void showLevelScreen(void)
 	int level;	
 	
 	// increment level
-	game.level++;
+	game.stage++;
 	
 	// concatenate level number to level info string
-	level = game.level;
+	level = game.stage;
   sprintf(levelStr, "%d", level);
 	strcpy(str, strcat(str, levelStr)); 
 		
@@ -81,15 +81,25 @@ void showLevelScreen(void)
 	GLCD_DrawString (150, 150, "GET READY!");
 	
 	// delay before starting level
-	//osDelay(2000);
-	initGame();
+	osDelay(2000);
+	initLevel();
 }
 
 /*--------------------------------------------------
- *      Initialize game - Jack Dean
+ *      Initialise game - Jack Dean
  *---------------------------------------- ----------*/
 void initGame(void) 
 {						
+	game.player.lives = 2;
+	game.bomb.power = 1;
+	initLevel();
+}
+
+/*--------------------------------------------------
+ *      Initialise level - Jack Dean
+ *--------------------------------------------------*/
+void initLevel(void)
+{
 	int x;								// tile x coord
 	int y;								// tile y coord
 	int tileNum = 0;			// tile number	
@@ -156,8 +166,9 @@ void initGame(void)
 	game.player.tile = &game.tiles[1][1];
 	game.player.tile->hasPlayer = true;
 	drawBitmap(1 * TILE_SIZE, 1 * TILE_SIZE, bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);
+	game.player.lives = 2;
+	game.bomb.power = 1;
 	
-	game.bomb.power = 3;	// initialise bomb level
 	placeEnemies();
 	placeObjects();
 }
@@ -296,9 +307,15 @@ void movePlayer(int i)
 	// check player collision with enemies
 	if (game.player.tile->hasEnemy == true)
 	{
-		// restart game
-		GLCD_ClearScreen(); 
-		initGame();
+		if (game.player.lives-- < 0)
+		{
+			// restart game
+			GLCD_ClearScreen(); 
+			initGame();
+		}
+		else
+		{			
+		}
 	}
 	//osDelay(250);	
 }
@@ -418,9 +435,7 @@ void moveEnemies(void)
 				// check enemy collision with player
 				if (game.enemies[i].tile->hasPlayer == true)
 				{
-					// restart game
-					GLCD_ClearScreen(); 
-					initGame();
+					// do nothing for now				
 				}				
 			}		
 		}
@@ -720,6 +735,19 @@ void drawUI(void)
 	GLCD_DrawRectangle (0, 110, 30, 60);		// left
 	GLCD_DrawRectangle (30, 90, 60, 30);		// up
 	GLCD_DrawRectangle (410, 110, 40, 40);		// action
+	
+	char str[] = "Lives: ";	
+	char livesStr[2];
+	int lives;	
+	
+	// concatenate level number to level info string
+	lives = game.player.lives;
+	sprintf(livesStr, "%d", lives);
+	strcpy(str, strcat(str, livesStr)); 
+		
+	// print lives info
+	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+	GLCD_DrawString (0, 0, str);		;	
 }
 
 /*--------------------------------------------------
@@ -727,23 +755,23 @@ void drawUI(void)
  *--------------------------------------------------*/
 void updateDisplay(TOUCH_STATE  *tsc_state) 
 {
-  char buffer[128];
-  
-  GLCD_SetForegroundColor (GLCD_COLOR_BLACK);
-  sprintf(buffer, "%i   ", tsc_state->x);	 	// raw x_coord
-  GLCD_DrawString (0, 0, buffer);
-  
-  sprintf(buffer, "%i   ", tsc_state->y);	  // raw y_coord
-  GLCD_DrawString (0, 25, buffer);
+//  char buffer[128];
+//  
+//  GLCD_SetForegroundColor (GLCD_COLOR_BLACK);
+//  sprintf(buffer, "%i   ", tsc_state->x);	 	// raw x_coord
+//  GLCD_DrawString (0, 0, buffer);
+//  
+//  sprintf(buffer, "%i   ", tsc_state->y);	  // raw y_coord
+//  GLCD_DrawString (0, 25, buffer);
 }
 
 /*--------------------------------------------------
  *      Clear coords display (for testing) - Jack Dean
  *--------------------------------------------------*/
 void clearDisplay() {
-  GLCD_SetForegroundColor (GLCD_COLOR_WHITE);
-  GLCD_DrawString (0, 0, "   ");
-  GLCD_DrawString (0, 25, "   ");
+//  GLCD_SetForegroundColor (GLCD_COLOR_WHITE);
+//  GLCD_DrawString (0, 0, "   ");
+//  GLCD_DrawString (0, 25, "   ");
 }
 
 /*--------------------------------------------------

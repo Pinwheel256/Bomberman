@@ -82,6 +82,7 @@ typedef struct {
 	int x; 
 	int y;
 	Tile* tile;
+	int lives;
 } Player;
 
 typedef struct {
@@ -92,7 +93,7 @@ typedef struct {
 } Bomb;
 
 typedef struct Game {
-	int level;
+	int stage;
 	object_type object;
 	unsigned int num_ticks;		// could be used to control enemy speed
 	Player player;
@@ -112,6 +113,7 @@ typedef struct{
 void showStartScreen(void);
 void showLevelScreen(void);
 void initGame(void);
+void initLevel(void);
 void drawUI(void);
 void placeEnemies(void);
 void placeObjects(void);
