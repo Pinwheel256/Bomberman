@@ -304,8 +304,18 @@ void movePlayer(int i)
 	// check player collision with enemies
 	if (game.player.tile->hasEnemy == true)
 	{
-		if (game.player.lives-- < 0)
+		// check for lives left then decrement
+		if (game.player.lives-- <= 0)
 		{ 
+			// show game over screen
+			GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
+			GLCD_ClearScreen();
+			GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+			GLCD_DrawString (150, 50, "GAME OVER!");
+			
+			// delay before restarting game
+			osDelay(3000);
+			
 			initGame();			
 		}
 		else
