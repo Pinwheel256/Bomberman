@@ -93,6 +93,7 @@ typedef struct {
 } Bomb;
 
 typedef struct Game {
+	bool playing;							// flag used to stop threads
 	int stage;
 	object_type object;
 	unsigned int num_ticks;		// could be used to control enemy speed
@@ -110,6 +111,10 @@ typedef struct{
 /*--------------------------------------------------
  *      Function prototypes - Jack Dean
  *--------------------------------------------------*/
+void startBomb(void);
+void startEnemies(void);
+void stopEnemies(void);
+void loseLife(void);
 void showStartScreen(void);
 void showStageScreen(void);
 void initGame(void);
@@ -123,7 +128,6 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange);
 void playerAI(void);
 void moveEnemies(void);
 bool checkCollision(void);
-void startBomb(void);
 void dropBomb(void);
 void bombExplode(void);
 void controls(void);

@@ -78,6 +78,8 @@ updated functions in bomb_utils to draw the bitmaps
 cleaned up initGame and initStage functions
 implemented lives feature - WIP
 added game over screen
+fixed lives feature
+tweaked enemy and bomb threads to stop after player death
 
 TO DO.
 stop and start threads on stage reset

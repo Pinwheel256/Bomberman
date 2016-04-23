@@ -33,9 +33,9 @@ Game game;
  *      Initialise game - Jack Dean
  *---------------------------------------- ----------*/
 void initGame(void) 
-{						
+{							
 	game.player.lives = 2;
-	game.bomb.power = 1;
+	game.bomb.power = 2;
 	game.stage = 1;
 	showStartScreen();
 }
@@ -143,6 +143,10 @@ void initStage(void)
 	
 	placeEnemies();
 	placeObjects();
+	
+	// start enemy movement thread
+	game.playing = true;
+	startEnemies();
 }
 
 /*--------------------------------------------------
@@ -249,7 +253,6 @@ void placeObjects(void)
 	while (tile->type != WEAK && tile->object != DOOR);	// ensures weak and not door
 								
 	tile->object = POWERUP;		
-	//game.tiles[1][3].object = POWERUP;
 }	
 
 /*--------------------------------------------------
@@ -304,26 +307,8 @@ void movePlayer(int i)
 	// check player collision with enemies
 	if (game.player.tile->hasEnemy == true)
 	{
-		// check for lives left then decrement
-		if (game.player.lives-- <= 0)
-		{ 
-			// show game over screen
-			GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
-			GLCD_ClearScreen();
-			GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
-			GLCD_DrawString (150, 50, "GAME OVER!");
-			
-			// delay before restarting game
-			osDelay(3000);
-			
-			initGame();			
-		}
-		else
-		{		
-			initStage();
-		}
-	}
-	//osDelay(250);	
+		loseLife();
+	}	
 }
 
 /*--------------------------------------------------
@@ -388,64 +373,66 @@ void moveEnemies(void)
 		// for each enemy in game
 		for (i = 0; i < ENEMY_NUM; i++)
 		{	
-			if (game.enemies[i].alive)
-			{			
-				Tile* tile = game.enemies[i].tile;		// temp store enemy tile for easier field access
-				Enemy* enemy = &game.enemies[i];
-				
-				// randomly choose movement direction
-				randomnumber = rand() % 4;
-				
-				switch (randomnumber)
-				{
-					case 0:
-						if ((game.tiles[tile->y][tile->x+1].type == FLOOR) && 
-							 (!game.tiles[tile->y][tile->x+1].hasBomb) && 
-						   (!game.tiles[tile->y][tile->x+1].hasEnemy) &&
-							 (game.tiles[tile->y][tile->x+1].object == EMPTY)) // check tile is empty
-						{
-							updateEnemy(tile, enemy, 1, 0);																		
-						}												
-						break;
-					case 1:
-						if ((game.tiles[tile->y+1][tile->x].type == FLOOR) && 
-							 (!game.tiles[tile->y+1][tile->x].hasBomb) && 
-						   (!game.tiles[tile->y+1][tile->x].hasEnemy) &&
-							 (game.tiles[tile->y+1][tile->x].object == EMPTY)) // check tile is empty
-						{
-							updateEnemy(tile, enemy, 0, 1);
-						}
-						break;
-					case 2:
-						if ((game.tiles[tile->y][tile->x-1].type == FLOOR) && 
-							 (!game.tiles[tile->y][tile->x-1].hasBomb) && 
-						   (!game.tiles[tile->y][tile->x-1].hasEnemy) &&
-							 (game.tiles[tile->y][tile->x-1].object == EMPTY)) // check tile is empty
-						{
-							updateEnemy(tile, enemy, -1, 0);								
-						}
-						break;
-					case 3:
-						if ((game.tiles[tile->y-1][tile->x].type == FLOOR) && 
-							 (!game.tiles[tile->y-1][tile->x].hasBomb) && 
-						   (!game.tiles[tile->y-1][tile->x].hasEnemy) &&
-							 (game.tiles[tile->y-1][tile->x].object == EMPTY)) // check tile is empty
-						{
-							updateEnemy(tile, enemy, 0, -1);
-						}
-						break;
-					default:	// do nothing
-						break;
-				}
-				
-				// check enemy collision with player
-				if (game.enemies[i].tile->hasPlayer == true)
-				{
-					// do nothing for now				
-				}				
-			}		
+			if (game.playing == true)
+			{
+				if (game.enemies[i].alive)
+				{			
+					Tile* tile = game.enemies[i].tile;		// temp store enemy tile for easier field access
+					Enemy* enemy = &game.enemies[i];
+					
+					// randomly choose movement direction
+					randomnumber = rand() % 4;
+					
+					switch (randomnumber)
+					{
+						case 0:
+							if ((game.tiles[tile->y][tile->x+1].type == FLOOR) && 
+								 (!game.tiles[tile->y][tile->x+1].hasBomb) && 
+								 (!game.tiles[tile->y][tile->x+1].hasEnemy) &&
+								 (game.tiles[tile->y][tile->x+1].object == EMPTY)) // check tile is empty
+							{
+								updateEnemy(tile, enemy, 1, 0);																		
+							}												
+							break;
+						case 1:
+							if ((game.tiles[tile->y+1][tile->x].type == FLOOR) && 
+								 (!game.tiles[tile->y+1][tile->x].hasBomb) && 
+								 (!game.tiles[tile->y+1][tile->x].hasEnemy) &&
+								 (game.tiles[tile->y+1][tile->x].object == EMPTY)) // check tile is empty
+							{
+								updateEnemy(tile, enemy, 0, 1);
+							}
+							break;
+						case 2:
+							if ((game.tiles[tile->y][tile->x-1].type == FLOOR) && 
+								 (!game.tiles[tile->y][tile->x-1].hasBomb) && 
+								 (!game.tiles[tile->y][tile->x-1].hasEnemy) &&
+								 (game.tiles[tile->y][tile->x-1].object == EMPTY)) // check tile is empty
+							{
+								updateEnemy(tile, enemy, -1, 0);								
+							}
+							break;
+						case 3:
+							if ((game.tiles[tile->y-1][tile->x].type == FLOOR) && 
+								 (!game.tiles[tile->y-1][tile->x].hasBomb) && 
+								 (!game.tiles[tile->y-1][tile->x].hasEnemy) &&
+								 (game.tiles[tile->y-1][tile->x].object == EMPTY)) // check tile is empty
+							{
+								updateEnemy(tile, enemy, 0, -1);
+							}
+							break;
+						default:	// do nothing
+							break;
+					}
+					
+					// check enemy collision with player
+					if (game.enemies[i].tile->hasPlayer == true)
+					{
+						loseLife();			
+					}				
+				}	
+			}
 		}
-		//osDelay(750);
 	}	
 }
 
@@ -519,13 +506,12 @@ void controls(void)
 			{
 				updateDisplay(&tsc_state);
 
-				// signals bomb thread - startBomb in bomberman.c
+				// start bomb thread
 				startBomb();				
 			}
 			else
 			{
 				clearDisplay();				
-				//updateDisplay(&tsc_state);
 			}			
 		}
 		else
@@ -595,70 +581,109 @@ void bombExplode(void)
 	// remove bomb
 	game.bomb.tile->hasBomb = false;	
 	
-	// process explosions
-	for (i = 0; i < numTiles; i++)
+	if (game.playing == true)
 	{
-		// draw explosion
-		drawBitmap(tiles[i]->x * TILE_SIZE, 
-									tiles[i]->y * TILE_SIZE, 
-									explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);								
-					
-		if (tiles[i]->hasPlayer)		// check player collision
-		{					
-			// restart game
-			GLCD_ClearScreen(); 
-			initGame();
-		}
-		else if (tiles[i]->hasEnemy)		// check enemy collision
+		// process explosions
+		for (i = 0; i < numTiles; i++)
 		{
-			// kill enemy
-			tiles[i]->enemy->alive = false;			  
-			tiles[i]->enemy->tile->hasEnemy = false;
-			tiles[i]->enemy->tile->enemy = NULL;
-		}
-	}		
- 
-	osDelay(800);
-	
-	// clear explosions
-	for (i = 0; i < numTiles; i++)		
-	{
-		if (tiles[i]->type == FLOOR)
-		{
+			// draw explosion
 			drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 
-										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+										explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);								
+						
+			if (tiles[i]->hasPlayer)		// check player collision
+			{					
+				loseLife();
+				break;
+			}
+			else if (tiles[i]->hasEnemy)		// check enemy collision
+			{
+				// kill enemy
+				tiles[i]->enemy->alive = false;			  
+				tiles[i]->enemy->tile->hasEnemy = false;
+				tiles[i]->enemy->tile->enemy = NULL;
+			}
 		}
-		else if (tiles[i]->type == WEAK)
-		{
-			tiles[i]->type = FLOOR;		// change type to floor				
-			
-			// draw hidden objects
-			if (tiles[i]->object == DOOR)
-			{
-				drawBitmap(tiles[i]->x * TILE_SIZE, 
-									tiles[i]->y * TILE_SIZE, 
-									bomberman_comp.width, bomberman_comp.height, door.rle_pixel_data);										
-			}
-			else if (tiles[i]->object == POWERUP)
-			{
-				drawBitmap(tiles[i]->x * TILE_SIZE, 
-									tiles[i]->y * TILE_SIZE, 										
-									bomb_comp.width, bomb_comp.height, power_up.rle_pixel_data);
-			}
-			else
-			{
-				drawBitmap(tiles[i]->x * TILE_SIZE, 
-									tiles[i]->y * TILE_SIZE, 
-									floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
-			}
-		}												
+		
+		// let explosions linger
+		osDelay(800);
 	}
+	
+	if (game.playing == true)
+	{
+		// clear explosions
+		for (i = 0; i < numTiles; i++)		
+		{
+			if (tiles[i]->type == FLOOR)
+			{
+				drawBitmap(tiles[i]->x * TILE_SIZE, 
+											tiles[i]->y * TILE_SIZE, 
+											floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+			}
+			else if (tiles[i]->type == WEAK)
+			{
+				tiles[i]->type = FLOOR;		// change type to floor				
+				
+				// draw hidden objects
+				if (tiles[i]->object == DOOR)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										bomberman_comp.width, bomberman_comp.height, door.rle_pixel_data);										
+				}
+				else if (tiles[i]->object == POWERUP)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 										
+										bomb_comp.width, bomb_comp.height, power_up.rle_pixel_data);
+				}
+				else
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+				}
+			}												
+		}
+	}	
 	
 	// reset bomb
 	game.bomb.tile = NULL;
 	game.bomb.x = NULL;
 	game.bomb.y = NULL;
+}
+
+/*--------------------------------------------------
+ *      Lose life - Jack Dean
+ *--------------------------------------------------*/
+void loseLife(void)
+{
+	// check for lives left then decrement
+	if (game.player.lives-- <= 0)
+	{ 
+		
+		// stop enemy movement thread
+		game.playing = false;
+		osDelay(500);			
+		
+		// show game over screen
+		GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
+		GLCD_ClearScreen();
+		GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+		GLCD_DrawString (150, 50, "GAME OVER!");
+		
+		// delay before restarting game
+		osDelay(3000);
+		
+		initGame();			
+	}
+	else
+	{		
+		// stop enemy movement thread
+		game.playing = false;
+		osDelay(500);
+		initStage();
+	}
 }
 
 /*--------------------------------------------------
