@@ -9,8 +9,8 @@
  *
  * Author: Jack Dean
  *--------------------------------------------------*/
-#ifndef _BOMB_H
-#define _BOMB_H
+#ifndef _BOMBERMAN_H
+#define _BOMBERMAN_H
 
 #include <stdbool.h>
 #include "Board_Touch.h"
@@ -19,6 +19,7 @@
 #include "Board_GLCD.h"
 #include <stdlib.h>
 #include <stdio.h> 
+#include <cstring>
 #include <time.h>
 
 #define wait_delay HAL_Delay
@@ -36,7 +37,7 @@
  *--------------------------------------------------*/
 #define GRID_X  130
 #define GRID_Y  0
-#define TILE_SIZE  16
+#define TILE_SIZE  18
 #define ROWS  15
 #define COLS 15
 #define ENEMY_NUM 6
@@ -53,15 +54,17 @@
  *--------------------------------------------------*/
 
 typedef enum {SOLID, WEAK, FLOOR} tile_type;
-typedef enum {EMPTY, PLAYER, BOMB, ENEMY} object_type;
+typedef enum {EMPTY, DOOR, POWERUP} object_type;
 
 typedef struct Enemy Enemy;
 typedef struct Tile Tile;
 
 struct Tile {
-  tile_type type;	
+  tile_type type;
+	object_type object;
   int x;				
-	int y;					
+	int y;		
+	int number;	// not used
 	bool hasPlayer;
 	bool hasEnemy;
 	bool hasBomb;
@@ -85,10 +88,12 @@ typedef struct {
 	int x;
 	int y;
   Tile* tile;
-	int level;
+	int power;
 } Bomb;
 
 typedef struct Game {
+	int level;
+	object_type object;
 	unsigned int num_ticks;		// could be used to control enemy speed
 	Player player;
 	Enemy enemies[ENEMY_NUM];
@@ -104,11 +109,12 @@ typedef struct{
 /*--------------------------------------------------
  *      Function prototypes - Jack Dean
  *--------------------------------------------------*/
-void game_init(void);
+void showStartScreen(void);
+void showLevelScreen(void);
+void initGame(void);
 void drawUI(void);
-void drawAtCoords(int x, int y, int color);
-void drawAtPixels(int x, int y, int color);
 void placeEnemies(void);
+void placeObjects(void);
 void movePlayer(int i);
 void updatePlayer(Tile* tile, int xChange, int yChange);
 void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange);
@@ -124,7 +130,8 @@ void clearDisplay(void);
 void update_ball (void);
 void update_player(int);
 void check_collision(void);
-void drawBitmapPixels(int x, int y, const unsigned char *image);
-void drawBitmapCoords(int x, int y, const unsigned char *image);
+void drawChar(int x, int y, int color);
+void drawBitmap(int x, int y, int width, int height, const unsigned char *bitmap);
+extern unsigned int GLCD_RLE_Bitmap (unsigned int x, unsigned int y, unsigned int width, unsigned int height, const unsigned char *bitmap);
 
-#endif /* _BOMB_H */
+#endif /* _BOMBERMAN_H */
