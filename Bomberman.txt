@@ -69,9 +69,12 @@ updated explosion funtion to draw door and powerup if hidden
 22/4/16 - Jack
 updated bombExplode to take into account bomb power
 
+23/4/16 - Chris
+added bitmaps for the door and power up
+updated functions in bomb_utils to draw the bitmaps
+
 TO DO.
 Add functionality to door
-Need bitmaps for door and powerup
 Player movement: should player be constrained to tile centres after completing a move?
 Redraw conrol areas into more suitable shapes i.e. hollow circle split into areas.
 Use mutexes and mailbox? Seems to work fine without.

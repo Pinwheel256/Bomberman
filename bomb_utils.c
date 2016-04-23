@@ -632,13 +632,13 @@ void bombExplode(void)
 			{
 				drawBitmap(tiles[i]->x * TILE_SIZE, 
 									tiles[i]->y * TILE_SIZE, 
-									bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);										
+									bomberman_comp.width, bomberman_comp.height, door.rle_pixel_data);										
 			}
 			else if (tiles[i]->object == POWERUP)
 			{
 				drawBitmap(tiles[i]->x * TILE_SIZE, 
 									tiles[i]->y * TILE_SIZE, 										
-									bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
+									bomb_comp.width, bomb_comp.height, power_up.rle_pixel_data);
 			}
 			else
 			{

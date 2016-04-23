@@ -233,4 +233,52 @@ static const struct {
   "\275\367\275\367\275\367\275\367\275\367\275\367\275\367\275\367\275\367"
   "\275\367\275\367\275",
 };
+
+/* GIMP RGB C-Source image dump 1-byte-run-length-encoded (Door.c) */
+
+static const struct {
+  unsigned int   width;
+  unsigned int   height;
+  unsigned int   bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */ 
+  unsigned char  rle_pixel_data[598 + 1];
+} door = {
+  18, 18, 2,
+  "7@Q@Q@Q@Q@Q@Q\345\327\345\327\345\327\345\327\345\327\345\327@Q@Q@Q@Q@Q@"
+  "Q@Q@Q@Q@Q@Q@Q\345\327@Q@Q@Q@Q\345\327@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q\345\327\345"
+  "\327@Q@Q\345\327\345\327@Q@Q@Q@Q@Q@Q@Q\217\0\0\177\0\0@Q@Q\0\0@Q@Q\0\0@Q"
+  "@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q"
+  "@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q"
+  "@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q"
+  "@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q"
+  "@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0""8@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0"
+  "@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0"
+  "@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\0\0@Q@Q\217\0\0""8\0\0@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@"
+  "Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@Q@"
+  "Q@Q@Q@Q@Q@Q@Q@Q@Q",
+};
+
+/* GIMP RGB C-Source image dump 1-byte-run-length-encoded (Power_Up.c) */
+
+static const struct {
+  unsigned int   width;
+  unsigned int   height;
+  unsigned int   bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */ 
+  unsigned char  rle_pixel_data[651 + 1];
+} power_up = {
+  18, 18, 2,
+  "\177H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0"
+  "E\351E\351E\351E\351E\351E\351E\351E\351H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0E\351"
+  "k/k/k/k/k/k/E\351H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0E\351k/k/k/k/k/k/E\351H\0"
+  "H\0H\0H\0H\0H\0H\0H\0H\0H\0E\351k/k/k/k/k/k/E\351H\0H\0H\0H\0H\0H\0H\0H\0"
+  "H\0H\0E\351k/k/k/k/k/k/E\351H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0E\351k/k/k/k/k"
+  "/k/E\351H\0H\0H\0H\0H\0H\0\177H\0H\0H\0H\0E\351k/k/k/k/k/k/E\351H\0H\0H\0"
+  "H\0H\0H\0H\0H\0H\0H\0E\351k/k/k/k/k/k/E\351H\0H\0H\0H\0H\0H\0E\351E\351E"
+  "\351E\351E\351k/k/k/k/k/k/E\351E\351E\351E\351E\351H\0H\0E\351k/k/k/k/k/"
+  "k/k/k/k/k/k/k/k/k/E\351H\0H\0H\0E\351k/k/k/k/k/k/k/k/k/k/k/k/E\351H\0H\0"
+  "H\0H\0H\0E\351k/k/k/k/k/k/k/k/k/k/E\351H\0H\0H\0H\0H\0H\0H\0E\351k/k/k/k"
+  "/k/k/k/k/E\351H\0H\0H\0H\0H\0H\0FH\0H\0H\0E\351k/k/k/k/k/k/E\351H\0H\0H\0"
+  "H\0H\0H\0H\0H\0H\0H\0H\0E\351k/k/k/k/E\351H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0"
+  "H\0H\0H\0E\351k/k/E\351H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0H\0E\351"
+  "E\351H\0H\0H\0H\0H\0H\0H\0H\0",
+};
 #endif /* _BITMAPS_H */
