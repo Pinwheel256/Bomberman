@@ -73,6 +73,9 @@ updated bombExplode to take into account bomb power
 added bitmaps for the door and power up
 updated functions in bomb_utils to draw the bitmaps
 
+23/4/16 - Jack
+implemented lives feature - WIP
+
 TO DO.
 Add functionality to door
 Player movement: should player be constrained to tile centres after completing a move?

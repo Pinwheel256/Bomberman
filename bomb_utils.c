@@ -30,6 +30,17 @@ extern GLCD_FONT     GLCD_Font_16x24;
 Game game;
 
 /*--------------------------------------------------
+ *      Initialise game - Jack Dean
+ *---------------------------------------- ----------*/
+void initGame(void) 
+{						
+	game.player.lives = 2;
+	game.bomb.power = 1;
+	game.stage = 1;
+	showStartScreen();
+}
+
+/*--------------------------------------------------
  *      Show start screen - Jack Dean
  *---------------------------------------- ----------*/
 void showStartScreen(void) 
@@ -52,64 +63,27 @@ void showStartScreen(void)
 		}
 	}
 	
-	game.stage = 0;			// init game level
-	showLevelScreen();	// show first level screen
+	initStage();	// start first stage
 }
 
 /*--------------------------------------------------
- *      Show level screen - Jack Dean
- *---------------------------------------- ----------*/
-void showLevelScreen(void) 
-{	
-	char str[] = "Level ";	
-	char levelStr[2];
-	int level;	
-	
-	// increment level
-	game.stage++;
-	
-	// concatenate level number to level info string
-	level = game.stage;
-  sprintf(levelStr, "%d", level);
-	strcpy(str, strcat(str, levelStr)); 
-		
-	// print level info
-	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
-	GLCD_ClearScreen();
-	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
-	GLCD_DrawString (150, 50, str);
-	GLCD_DrawString (150, 150, "GET READY!");
-	
-	// delay before starting level
-	osDelay(2000);
-	initLevel();
-}
-
-/*--------------------------------------------------
- *      Initialise game - Jack Dean
- *---------------------------------------- ----------*/
-void initGame(void) 
-{						
-	game.player.lives = 2;
-	game.bomb.power = 1;
-	initLevel();
-}
-
-/*--------------------------------------------------
- *      Initialise level - Jack Dean
+ *      Initialise stage - Jack Dean
  *--------------------------------------------------*/
-void initLevel(void)
+void initStage(void)
 {
 	int x;								// tile x coord
 	int y;								// tile y coord
 	int tileNum = 0;			// tile number	
 	int randNum;
 	
+	// display stage info
+	showStageScreen();
+	
 	// set game background
 	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
   GLCD_ClearScreen(); 
 	
-	// draw touch screen control areas
+	// draw UI and control areas
 	drawUI();
 	
 	// initialise and draw game level	
@@ -166,11 +140,34 @@ void initLevel(void)
 	game.player.tile = &game.tiles[1][1];
 	game.player.tile->hasPlayer = true;
 	drawBitmap(1 * TILE_SIZE, 1 * TILE_SIZE, bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);
-	game.player.lives = 2;
-	game.bomb.power = 1;
 	
 	placeEnemies();
 	placeObjects();
+}
+
+/*--------------------------------------------------
+ *      Show stage screen - Jack Dean
+ *---------------------------------------- ----------*/
+void showStageScreen(void) 
+{	
+	char str[] = "Stage ";	
+	char stageStr[2];
+	int stage;	
+	
+	// concatenate level number to level info string
+	stage = game.stage;
+  sprintf(stageStr, "%d", stage);
+	strcpy(str, strcat(str, stageStr)); 
+		
+	// print level info
+	GLCD_SetBackgroundColor(GLCD_COLOR_BLACK);
+	GLCD_ClearScreen();
+	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+	GLCD_DrawString (150, 50, str);
+	GLCD_DrawString (150, 150, "GET READY!");
+	
+	// delay before starting level
+	osDelay(2000);
 }
 
 /*--------------------------------------------------
@@ -308,13 +305,12 @@ void movePlayer(int i)
 	if (game.player.tile->hasEnemy == true)
 	{
 		if (game.player.lives-- < 0)
-		{
-			// restart game
-			GLCD_ClearScreen(); 
-			initGame();
+		{ 
+			initGame();			
 		}
 		else
-		{			
+		{		
+			initStage();
 		}
 	}
 	//osDelay(250);	
@@ -729,16 +725,16 @@ unsigned int GLCD_RLE_Bitmap (unsigned int x, unsigned int y, unsigned int width
  *--------------------------------------------------*/
 void drawUI(void)
 {
+	int lives;	
+	char str[] = "Lives: ";	
+	char livesStr[2];	
+	
 	GLCD_SetForegroundColor (GLCD_COLOR_WHITE);	
 	GLCD_DrawRectangle (90, 110, 30, 60);		// right
 	GLCD_DrawRectangle (30, 160, 60, 30);		// down
 	GLCD_DrawRectangle (0, 110, 30, 60);		// left
 	GLCD_DrawRectangle (30, 90, 60, 30);		// up
 	GLCD_DrawRectangle (410, 110, 40, 40);		// action
-	
-	char str[] = "Lives: ";	
-	char livesStr[2];
-	int lives;	
 	
 	// concatenate level number to level info string
 	lives = game.player.lives;

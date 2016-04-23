@@ -161,7 +161,7 @@ void startBomb()
 void taskA (void const *argument) {
   for (;;) {
 		osSignalWait(0x0001, osWaitForever);		
-		showStartScreen();
+		initGame();
 		osSignalSet(tid_taskC, 1U);
 		osSignalSet(tid_taskB, 1U);		
   }

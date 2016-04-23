@@ -111,9 +111,9 @@ typedef struct{
  *      Function prototypes - Jack Dean
  *--------------------------------------------------*/
 void showStartScreen(void);
-void showLevelScreen(void);
+void showStageScreen(void);
 void initGame(void);
-void initLevel(void);
+void initStage(void);
 void drawUI(void);
 void placeEnemies(void);
 void placeObjects(void);
