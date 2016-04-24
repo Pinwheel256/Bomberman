@@ -40,7 +40,7 @@
 #define TILE_SIZE  18
 #define ROWS  15
 #define COLS 15
-#define ENEMY_NUM 6
+#define MAX_ENEMIES 10
 #define SOLID_COL GLCD_COLOR_BLUE
 #define WEAK_COL GLCD_COLOR_GREEN
 #define FLOOR_COL GLCD_COLOR_WHITE
@@ -93,12 +93,13 @@ typedef struct {
 } Bomb;
 
 typedef struct Game {
-	bool playing;							// flag used to stop threads
+	bool playing;							// flag used to pause thread functions
 	int stage;
 	object_type object;
-	unsigned int num_ticks;		// could be used to control enemy speed
 	Player player;
-	Enemy enemies[ENEMY_NUM];
+	Enemy enemies[MAX_ENEMIES];
+	int numEnemies;
+	int enemySpeed;
 	Bomb bomb;
 	Tile tiles[ROWS][COLS];		// 2 dimensional array, represents y and x coordinates within a rectangular map of tiles
 } Game;

@@ -85,6 +85,7 @@ tweaked enemy, bomb and movement threads/functions to stop after player death
 
 24/4/16 - Jack
 fixed bug where door and powerup locations persisted into next stage
+added difficulty modifiers: enemyNum and enemySpeed
 
 
 TO DO.

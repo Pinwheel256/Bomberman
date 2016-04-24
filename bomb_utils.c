@@ -36,6 +36,8 @@ void initGame(void)
 {							
 	game.player.lives = 2;
 	game.bomb.power = 2;
+	game.numEnemies = 5;
+	game.enemySpeed = 18;
 	game.stage = 1;
 	showStartScreen();
 }
@@ -206,7 +208,7 @@ void placeEnemies(void)
 	}
 	
 	// store enemy tile locations (Fisher-Yates Shuffle algorithm)																			
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < game.numEnemies; i++)
 	{		
 		// get random tile
 		do 
@@ -304,12 +306,25 @@ void movePlayer(int i)
 	
 	// check for object
 	if (game.player.tile->object == DOOR)
-	{
-		// start next stage
+	{		
 		game.playing = false;
 		osDelay(500);
-		game.stage++;
-		initStage();
+		
+		// start next stage
+		if (game.stage++ <= 6)
+		{
+			// increase difficulty
+			game.numEnemies++;
+			game.enemySpeed -= 2;
+			
+			initStage();
+		}
+		else
+		{
+			// game complete, restart game
+			initGame();
+		}
+		
 	}
 	else if (game.player.tile->object == POWERUP)
 	{
@@ -391,7 +406,7 @@ void moveEnemies(void)
 	while (true)
 	{
 		// for each enemy in game
-		for (i = 0; i < ENEMY_NUM; i++)
+		for (i = 0; i < game.numEnemies; i++)
 		{	
 			if (game.playing == true)
 			{
@@ -475,7 +490,7 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 										enemy_comp.width,
 										enemy_comp.height,
 										enemy_comp.rle_pixel_data);		
-		osDelay(15);
+		osDelay(game.enemySpeed);
 	}
 	
 	// change tile statuses
