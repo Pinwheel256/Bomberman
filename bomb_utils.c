@@ -34,10 +34,9 @@ Game game;
  *---------------------------------------- ----------*/
 void initGame(void) 
 {							
+	game.player.score = 0;
 	game.player.lives = 2;
 	game.bomb.power = 2;
-	game.numEnemies = 5;
-	game.enemySpeed = 30;
 	game.stage = 1;
 	showStartScreen();
 }
@@ -208,7 +207,7 @@ void placeEnemies(void)
 	}
 	
 	// store enemy tile locations (Fisher-Yates Shuffle algorithm)																			
-	for (i = 0; i < game.numEnemies; i++)
+	for (i = 0; i < 6; i++)
 	{		
 		// get random tile
 		do 
@@ -306,25 +305,12 @@ void movePlayer(int i)
 	
 	// check for object
 	if (game.player.tile->object == DOOR)
-	{		
+	{
+		// start next stage
 		game.playing = false;
 		osDelay(500);
-		
-		// start next stage
-		if (game.stage++ <= 6)
-		{
-			// increase difficulty
-			game.numEnemies++;
-			game.enemySpeed -= 4;
-			
-			initStage();
-		}
-		else
-		{
-			// game complete, restart game
-			initGame();
-		}
-		
+		game.stage++;
+		initStage();
 	}
 	else if (game.player.tile->object == POWERUP)
 	{
@@ -345,15 +331,6 @@ void movePlayer(int i)
 void updatePlayer(Tile* tile, int xChange, int yChange)
 {	
 	int i;
-	
-	// change tile statuses
-	tile->hasPlayer = false;					
-	game.player.tile = &game.tiles[tile->y + yChange][tile->x + xChange];							
-	game.player.tile->hasPlayer = true;
-	
-	// update player location
-	game.player.x += xChange;
-	game.player.y += yChange;	
 	
 	for (i = 0; i < TILE_SIZE; i++)
 	{
@@ -392,7 +369,16 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 		{
 			return;
 		}		
-	}	
+	}
+
+	// change tile statuses
+	tile->hasPlayer = false;					
+	game.player.tile = &game.tiles[tile->y + yChange][tile->x + xChange];							
+	game.player.tile->hasPlayer = true;
+	
+	// update player location
+	game.player.x += xChange;
+	game.player.y += yChange;	
 }
 
 /*--------------------------------------------------
@@ -406,7 +392,7 @@ void moveEnemies(void)
 	while (true)
 	{
 		// for each enemy in game
-		for (i = 0; i < game.numEnemies; i++)
+		for (i = 0; i < ENEMY_NUM; i++)
 		{	
 			if (game.playing == true)
 			{
@@ -490,7 +476,7 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 										enemy_comp.width,
 										enemy_comp.height,
 										enemy_comp.rle_pixel_data);		
-		osDelay(game.enemySpeed);
+		osDelay(15);
 	}
 	
 	// change tile statuses
@@ -637,6 +623,8 @@ void bombExplode(void)
 				tiles[i]->enemy->alive = false;			  
 				tiles[i]->enemy->tile->hasEnemy = false;
 				tiles[i]->enemy->tile->enemy = NULL;
+				game.player.score += 1;
+				updateScore();
 			}
 		}		
 		
@@ -659,10 +647,8 @@ void bombExplode(void)
 			for (i = 0; i < numTiles; i++)		
 			{
 				if (tiles[i]->type == WEAK)
-				{
-					tiles[i]->type = FLOOR;		// change type to floor	
-				}
-																			
+									tiles[i]->type = FLOOR;		// change type to floor				
+			
 				// draw hidden objects
 				if (tiles[i]->object == DOOR)
 				{
@@ -675,18 +661,6 @@ void bombExplode(void)
 					drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 										
 										power_up.width, power_up.height, power_up.rle_pixel_data);
-				}
-				else if (tiles[i]->hasPlayer)
-				{
-					drawBitmap(tiles[i]->x * TILE_SIZE, 
-										tiles[i]->y * TILE_SIZE, 
-										bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);			
-				}
-				else if (tiles[i]->hasEnemy)
-				{
-					drawBitmap(tiles[i]->x * TILE_SIZE, 
-										tiles[i]->y * TILE_SIZE, 
-										enemy_comp.width, enemy_comp.height, enemy_comp.rle_pixel_data);		
 				}
 				else
 				{
@@ -736,6 +710,20 @@ void loseLife(void)
 		initStage();
 	}
 }
+
+/*--------------------------------------------------
+ *      Update Score - Chris Hughes
+ *--------------------------------------------------*/
+void updateScore()
+{
+	char outScore[3];
+	
+	sprintf(outScore, "%2d",game.player.score);
+	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+	GLCD_DrawString (96, 25, outScore);
+	
+}
+
 
 /*--------------------------------------------------
  *      Draw char - Jack Dean
@@ -814,6 +802,7 @@ void drawUI(void)
 	int lives;	
 	char str[] = "Lives: ";	
 	char livesStr[2];	
+	char outScore[10];
 	
 	GLCD_SetForegroundColor (GLCD_COLOR_WHITE);	
 	GLCD_DrawRectangle (90, 110, 30, 60);		// right
@@ -825,11 +814,15 @@ void drawUI(void)
 	// concatenate level number to level info string
 	lives = game.player.lives;
 	sprintf(livesStr, "%d", lives);
-	strcpy(str, strcat(str, livesStr)); 
+	strcpy(str, strcat(str, livesStr));
 		
 	// print lives info
 	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
-	GLCD_DrawString (0, 0, str);		;	
+	GLCD_DrawString (0, 0, str);
+	
+	//print score info
+	sprintf(outScore, "Score:%2d", game.player.score);
+	GLCD_DrawString (0, 25, outScore);
 }
 
 /*--------------------------------------------------
