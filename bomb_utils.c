@@ -102,6 +102,7 @@ void initStage(void)
 			tile->hasPlayer = false;
 			tile->hasEnemy = false;
 			tile->hasBomb = false;
+			tile->object = EMPTY;
 			tile->enemy = NULL;								
 			
 			// place solid tiles
@@ -145,6 +146,11 @@ void initStage(void)
 	game.player.tile->hasPlayer = true;
 	drawBitmap(1 * TILE_SIZE, 1 * TILE_SIZE, bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);
 	
+	// reset bomb
+	game.bomb.tile = NULL;
+	game.bomb.x = NULL;
+	game.bomb.y = NULL;
+
 	placeEnemies();
 	placeObjects();
 	
@@ -299,13 +305,16 @@ void movePlayer(int i)
 	// check for object
 	if (game.player.tile->object == DOOR)
 	{
-		// restart game
-		GLCD_ClearScreen(); 
-		initGame();
+		// start next stage
+		game.playing = false;
+		osDelay(500);
+		game.stage++;
+		initStage();
 	}
 	else if (game.player.tile->object == POWERUP)
 	{
 		game.bomb.power++;
+		game.player.tile->object = EMPTY;
 	}
 	
 	// check player collision with enemies
@@ -323,35 +332,42 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 	int i;
 	
 	for (i = 0; i < TILE_SIZE; i++)
-	{		
-		if (tile->hasBomb)		
-		{	
-			// redraw floor
-			drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
-										(tile->y * TILE_SIZE) + (i * yChange), 
-										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
-			
-			// then redraw bomb
-			drawBitmap(tile->x * TILE_SIZE, tile->y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
+	{
+		if (game.playing == true)
+		{
+			if (tile->hasBomb)		
+			{	
+				// redraw floor
+				drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
+											(tile->y * TILE_SIZE) + (i * yChange), 
+											floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+				
+				// then redraw bomb
+				drawBitmap(tile->x * TILE_SIZE, tile->y * TILE_SIZE, bomb_comp.width, bomb_comp.height, bomb_comp.rle_pixel_data);
 
+			}
+			else
+			{
+				// redraw floor
+				drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
+											(tile->y * TILE_SIZE) + (i * yChange), 
+											floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);	
+			}
+			
+			// finally, redraw player
+			drawBitmap((tile->x * TILE_SIZE) + ((i+1) * xChange), 
+											 (tile->y * TILE_SIZE) + ((i+1) * yChange),
+												bomberman_comp.width,
+												bomberman_comp.height,
+												bomberman_comp.rle_pixel_data);
+			
+			// movement speed
+			osDelay(5);	
 		}
 		else
 		{
-			// redraw floor
-			drawBitmap((tile->x * TILE_SIZE) + (i * xChange), 
-										(tile->y * TILE_SIZE) + (i * yChange), 
-										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);	
-		}
-		
-		// finally, redraw player
-		drawBitmap((tile->x * TILE_SIZE) + ((i+1) * xChange), 
-										 (tile->y * TILE_SIZE) + ((i+1) * yChange),
-											bomberman_comp.width,
-											bomberman_comp.height,
-											bomberman_comp.rle_pixel_data);
-		
-		// movement speed
-		osDelay(5);	
+			return;
+		}		
 	}
 
 	// change tile statuses
@@ -596,9 +612,9 @@ void bombExplode(void)
 										explo_comp.width, explo_comp.height, explo_comp.rle_pixel_data);								
 						
 			if (tiles[i]->hasPlayer)		// check player collision
-			{					
+			{									
 				loseLife();
-				break;
+				return;
 			}
 			else if (tiles[i]->hasEnemy)		// check enemy collision
 			{
@@ -607,41 +623,51 @@ void bombExplode(void)
 				tiles[i]->enemy->tile->hasEnemy = false;
 				tiles[i]->enemy->tile->enemy = NULL;
 			}
-		}
+		}		
 		
 		// let explosions linger
-		osDelay(800);
-	}
-	
-	if (game.playing == true)
-	{
-		// clear explosions
-		for (i = 0; i < numTiles; i++)		
+		for (i = 0; i < 10; i++)
 		{
-			if (tiles[i]->type == WEAK)
-								tiles[i]->type = FLOOR;		// change type to floor				
-		
-			// draw hidden objects
-			if (tiles[i]->object == DOOR)
+			if (game.playing == true)
 			{
-				drawBitmap(tiles[i]->x * TILE_SIZE, 
-									tiles[i]->y * TILE_SIZE, 
-									bomberman_comp.width, bomberman_comp.height, door.rle_pixel_data);										
-			}
-			else if (tiles[i]->object == POWERUP)
-			{
-				drawBitmap(tiles[i]->x * TILE_SIZE, 
-									tiles[i]->y * TILE_SIZE, 										
-									bomb_comp.width, bomb_comp.height, power_up.rle_pixel_data);
+				osDelay(80);
 			}
 			else
 			{
-				drawBitmap(tiles[i]->x * TILE_SIZE, 
-									tiles[i]->y * TILE_SIZE, 
-									floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
-			}							
-		}
-	}	
+				return;
+			}
+		}				
+		
+		if (game.playing == true)
+		{
+			// clear explosions
+			for (i = 0; i < numTiles; i++)		
+			{
+				if (tiles[i]->type == WEAK)
+									tiles[i]->type = FLOOR;		// change type to floor				
+			
+				// draw hidden objects
+				if (tiles[i]->object == DOOR)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										door.width, door.height, door.rle_pixel_data);										
+				}
+				else if (tiles[i]->object == POWERUP)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 										
+										power_up.width, power_up.height, power_up.rle_pixel_data);
+				}
+				else
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										floor_comp.width, floor_comp.height, floor_comp.rle_pixel_data);
+				}							
+			}
+		}			
+	}
 	
 	// reset bomb
 	game.bomb.tile = NULL;
