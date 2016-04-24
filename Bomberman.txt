@@ -89,19 +89,12 @@ added difficulty modifiers: enemyNum and enemySpeed
 
 
 TO DO.
-stop and start threads on stage reset
-Add functionality to door
-Player movement: should player be constrained to tile centres after completing a move?
-Redraw conrol areas into more suitable shapes i.e. hollow circle split into areas.
-Use mutexes and mailbox? Seems to work fine without.
-Malloc and free everything to preserve memory?
-Add audio?
-Add timer?
-Add lives?
-Add difficulty modifiers for levels?
-Add game over, game start, stage screens?
+Redraw control areas into more suitable shapes i.e. hollow circle split into areas.
+Use mutexes and mailbox for more marks? Seems to work fine without.
 Add points?
-Make multiplayer?
+Add timer?
+Add audio?
+Player movement: should player be constrained to tile centres after completing a move?
 
 BUGS.
 1. Bomb thread continues after player death and any pending explosions will appear after level reset
