@@ -67,6 +67,7 @@ added placeObjects function to place door and powerup objects
 updated explosion function to draw door and powerup if hidden
 
 22/4/16 - Jack
+added functionality to powerup pickup
 updated bombExplode to take into account bomb power
 
 23/4/16 - Chris
@@ -75,7 +76,19 @@ updated functions in bomb_utils to draw the bitmaps
 added large bomberman bitmap to splash screen & moved text slightly
 updated explosion function to draw door/powerup if they were already revealed
 
+23/4/16 - Jack
+cleaned up initGame and initStage functions
+implemented lives feature - WIP
+added game over screen
+fixed lives feature
+tweaked enemy, bomb and movement threads/functions to stop after player death
+
+24/4/16 - Jack
+fixed bug where door and powerup locations persisted into next stage
+
+
 TO DO.
+stop and start threads on stage reset
 Add functionality to door
 Player movement: should player be constrained to tile centres after completing a move?
 Redraw conrol areas into more suitable shapes i.e. hollow circle split into areas.

@@ -149,6 +149,16 @@ void startBomb()
 {			
 	osSignalSet(tid_taskD, 1U);
 }
+
+void startEnemies()
+{			
+	osSignalSet(tid_taskC, 1U);
+}
+
+void startControls()
+{			
+	osSignalSet(tid_taskB, 1U);
+}
 	
 
 /*********************************************************************
@@ -156,34 +166,35 @@ void startBomb()
 *
 */
 /*--------------------------------------------------
- *      Thread 1 'taskA': Player movement - Jack Dean
+ *      Thread 1 'taskA': Initialisation task - Jack Dean
  *--------------------------------------------------*/
 void taskA (void const *argument) {
   for (;;) {
 		osSignalWait(0x0001, osWaitForever);		
-		showStartScreen();
-		osSignalSet(tid_taskC, 1U);
-		osSignalSet(tid_taskB, 1U);		
+			
+		initGame();										// start game	
+		osSignalSet(tid_taskB, 1U);		// start controls thread	
   }
 }
 
 /*--------------------------------------------------
- *      Thread 2 'taskB': Enemy movement - Jack Dean
+ *      Thread 2 'taskB': Contols - Jack Dean
  *--------------------------------------------------*/
 void taskB (void const *argument) {
   for (;;) {
 		osSignalWait(0x0001, osWaitForever);
-		moveEnemies();
+		controls();
   }
 }
 
 /*--------------------------------------------------
- *      Thread 3 'taskC': Contols - Jack Dean
+ *      Thread 3 'taskC': Enemy movement - Jack Dean
  *--------------------------------------------------*/
+
 void taskC (void const *argument) {
   for (;;) {
-		osSignalWait(0x0001, osWaitForever);
-		controls();
+		osSignalWait(0x0001, osWaitForever);		
+		moveEnemies();
   }
 }
 
@@ -244,8 +255,6 @@ int main (void) {
   osKernelInitialize();                     /* initialize CMSIS-RTOS          */	
 	Touch_Initialize();                            /* Touchscrn Controller Init */ 
 	GLCD_Initialize();
-  //GLCD_SetBackgroundColor (GLCD_COLOR_WHITE);
-  //GLCD_ClearScreen(); 
   GLCD_SetFont(&GLCD_Font_16x24);	
 
 	/* Initialize RTX variables */
@@ -259,14 +268,16 @@ int main (void) {
 	tid_taskF = osThreadCreate(osThread(taskC), NULL);
 	tid_taskG = osThreadCreate(osThread(taskD), NULL);
 	
+	
 /*--------------------------------------------------
  *      Run game
  *--------------------------------------------------*/
 	osKernelStart();	// when used clock speed in conf is used so is faster?
+	
 	osSignalSet(tid_taskA, 1U);    // signal taskA
 
 	osDelay(osWaitForever);
-	while(1);	
+	while(1);
 }
 
 /*************************** End of file ****************************/
