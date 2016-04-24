@@ -40,7 +40,7 @@
 #define TILE_SIZE  18
 #define ROWS  15
 #define COLS 15
-#define MAX_ENEMIES 10
+#define ENEMY_NUM 6
 #define SOLID_COL GLCD_COLOR_BLUE
 #define WEAK_COL GLCD_COLOR_GREEN
 #define FLOOR_COL GLCD_COLOR_WHITE
@@ -83,6 +83,7 @@ typedef struct {
 	int y;
 	Tile* tile;
 	int lives;
+	int score;
 } Player;
 
 typedef struct {
@@ -93,13 +94,12 @@ typedef struct {
 } Bomb;
 
 typedef struct Game {
-	bool playing;							// flag used to pause thread functions
+	bool playing;							// flag used to stop threads
 	int stage;
 	object_type object;
+	unsigned int num_ticks;		// could be used to control enemy speed
 	Player player;
-	Enemy enemies[MAX_ENEMIES];
-	int numEnemies;
-	int enemySpeed;
+	Enemy enemies[ENEMY_NUM];
 	Bomb bomb;
 	Tile tiles[ROWS][COLS];		// 2 dimensional array, represents y and x coordinates within a rectangular map of tiles
 } Game;
@@ -140,5 +140,6 @@ void check_collision(void);
 void drawChar(int x, int y, int color);
 void drawBitmap(int x, int y, int width, int height, const unsigned char *bitmap);
 extern unsigned int GLCD_RLE_Bitmap (unsigned int x, unsigned int y, unsigned int width, unsigned int height, const unsigned char *bitmap);
+void updateScore(void);
 
 #endif /* _BOMBERMAN_H */
