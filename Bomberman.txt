@@ -86,9 +86,12 @@ tweaked enemy, bomb and movement threads/functions to stop after player death
 24/4/16 - Jack
 fixed bug where door and powerup locations persisted into next stage
 added difficulty modifiers: enemyNum and enemySpeed
-
+fixed bug where bomb clears were drawing floor tiles over player
+moved player tile change from end to start of move animation to fix new bug created by the above
+better balanced enemy difficulty between stages
 
 TO DO.
+tweak bomb explo to not go past weak tiles
 Redraw control areas into more suitable shapes i.e. hollow circle split into areas.
 Use mutexes and mailbox for more marks? Seems to work fine without.
 Add points?
@@ -97,9 +100,8 @@ Add audio?
 Player movement: should player be constrained to tile centres after completing a move?
 
 BUGS.
-1. Bomb thread continues after player death and any pending explosions will appear after level reset
-2. Bomb explosions only check for collision once at start of animation
-3. Player move thread continues after game reset. Need pause in between games to restart threads and reset game variables
+bomb explo clears needs to redraw the player/enemy if they are present, rather than floor 
+Bomb explosions only check for collision once at start of animation, problem?
 
 TESTING.
 

@@ -37,7 +37,7 @@ void initGame(void)
 	game.player.lives = 2;
 	game.bomb.power = 2;
 	game.numEnemies = 5;
-	game.enemySpeed = 18;
+	game.enemySpeed = 30;
 	game.stage = 1;
 	showStartScreen();
 }
@@ -315,7 +315,7 @@ void movePlayer(int i)
 		{
 			// increase difficulty
 			game.numEnemies++;
-			game.enemySpeed -= 2;
+			game.enemySpeed -= 4;
 			
 			initStage();
 		}
@@ -345,6 +345,15 @@ void movePlayer(int i)
 void updatePlayer(Tile* tile, int xChange, int yChange)
 {	
 	int i;
+	
+	// change tile statuses
+	tile->hasPlayer = false;					
+	game.player.tile = &game.tiles[tile->y + yChange][tile->x + xChange];							
+	game.player.tile->hasPlayer = true;
+	
+	// update player location
+	game.player.x += xChange;
+	game.player.y += yChange;	
 	
 	for (i = 0; i < TILE_SIZE; i++)
 	{
@@ -383,16 +392,7 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 		{
 			return;
 		}		
-	}
-
-	// change tile statuses
-	tile->hasPlayer = false;					
-	game.player.tile = &game.tiles[tile->y + yChange][tile->x + xChange];							
-	game.player.tile->hasPlayer = true;
-	
-	// update player location
-	game.player.x += xChange;
-	game.player.y += yChange;	
+	}	
 }
 
 /*--------------------------------------------------
@@ -659,8 +659,10 @@ void bombExplode(void)
 			for (i = 0; i < numTiles; i++)		
 			{
 				if (tiles[i]->type == WEAK)
-									tiles[i]->type = FLOOR;		// change type to floor				
-			
+				{
+					tiles[i]->type = FLOOR;		// change type to floor	
+				}
+																			
 				// draw hidden objects
 				if (tiles[i]->object == DOOR)
 				{
@@ -673,6 +675,18 @@ void bombExplode(void)
 					drawBitmap(tiles[i]->x * TILE_SIZE, 
 										tiles[i]->y * TILE_SIZE, 										
 										power_up.width, power_up.height, power_up.rle_pixel_data);
+				}
+				else if (tiles[i]->hasPlayer)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										bomberman_comp.width, bomberman_comp.height, bomberman_comp.rle_pixel_data);			
+				}
+				else if (tiles[i]->hasEnemy)
+				{
+					drawBitmap(tiles[i]->x * TILE_SIZE, 
+										tiles[i]->y * TILE_SIZE, 
+										enemy_comp.width, enemy_comp.height, enemy_comp.rle_pixel_data);		
 				}
 				else
 				{
