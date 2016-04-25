@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    bomberman.c 
-  * @author  jack.dean@uea.ac.uk
+  * @author  Jack Dean		
   * @version V1.0.1
   * @date    26-03-2016
   * @brief   Simple version of Bomberman game.

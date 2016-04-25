@@ -99,8 +99,7 @@ Add timer?
 Add audio?
 Player movement: should player be constrained to tile centres after completing a move?
 
-BUGS.
-bomb explo clears needs to redraw the player/enemy if they are present, rather than floor 
+BUGS. 
 Bomb explosions only check for collision once at start of animation, problem?
 
 TESTING.

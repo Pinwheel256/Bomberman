@@ -5,7 +5,6 @@
  *
  * Modification History
  * 26-03-2016 Created
- * 26-03-2016 Updated (uVision5.17 + DFP2.6.0)
  *
  * Author: Jack Dean
  *--------------------------------------------------*/
@@ -64,7 +63,7 @@ struct Tile {
 	object_type object;
   int x;				
 	int y;		
-	int number;	// not used
+	int number;
 	bool hasPlayer;
 	bool hasEnemy;
 	bool hasBomb;
@@ -72,8 +71,6 @@ struct Tile {
 };
 
 struct Enemy {
-	//int x;					// not used
-	//int y;					// not used
 	bool alive;
   Tile* tile;
 };
@@ -83,6 +80,7 @@ typedef struct {
 	int y;
 	Tile* tile;
 	int lives;
+	int score;
 } Player;
 
 typedef struct {
@@ -94,14 +92,14 @@ typedef struct {
 
 typedef struct Game {
 	bool playing;							// flag used to pause thread functions
-	int stage;
-	object_type object;
+	int stage;								// current stage
 	Player player;
 	Enemy enemies[MAX_ENEMIES];
-	int numEnemies;
-	int enemySpeed;
+	int numEnemies;							// difficulty modifier
+	int enemySpeed;							// difficulty modifier
 	Bomb bomb;
-	Tile tiles[ROWS][COLS];		// 2 dimensional array, represents y and x coordinates within a rectangular map of tiles
+	Tile tiles[ROWS][COLS];		/* 2 dimensional array, represents y and x 
+																coordinates within a tile matrix */
 } Game;
 
 // mailbox struct
@@ -115,6 +113,7 @@ typedef struct{
 void startBomb(void);
 void startEnemies(void);
 void stopEnemies(void);
+void updateScore(void);
 void loseLife(void);
 void showStartScreen(void);
 void showStageScreen(void);

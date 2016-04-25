@@ -1,14 +1,12 @@
 /*--------------------------------------------------
- * Recipe:  Bomberman
  * Name:    bomb_utils.c
  * Purpose: Bomberman Prototype
  *--------------------------------------------------
  *
  * Modification History
  * 26-03-2016 Created
- * 26-03-2016 Updated (uVision5.17 + DFP2.6.0)
  *
- * Author: Jack Dean
+ * Author: Jack Dean, Chris Hughes
  *--------------------------------------------------*/
 
 #include "bomberman.h"
@@ -35,7 +33,8 @@ Game game;
 void initGame(void) 
 {							
 	game.player.lives = 2;
-	game.bomb.power = 2;
+	game.player.score = 0;
+	game.bomb.power = 1;
 	game.numEnemies = 5;
 	game.enemySpeed = 30;
 	game.stage = 1;
@@ -92,7 +91,7 @@ void initStage(void)
 	// draw UI and control areas
 	drawUI();
 	
-	// initialise and draw game level	
+	// initialise and draw tile map	
 	for (y = 0; y < ROWS; y++)					// iterate through tiles
 	{
 		for (x = 0; x < COLS; x++)
@@ -218,7 +217,8 @@ void placeEnemies(void)
 			x = randNum % 15;
 			tile = &game.tiles[y][x];
 		}
-		while ((tile->type != FLOOR) || (tile->y < 5));		// ensures floor tile and distance from player
+		// ensures floor tile and distance from player
+		while ((tile->type != FLOOR) || (tile->y < 5));		
 		
 		game.enemies[i].alive = true;
 		game.enemies[i].tile = tile;						
@@ -311,7 +311,7 @@ void movePlayer(int i)
 		osDelay(500);
 		
 		// start next stage
-		if (game.stage++ <= 6)
+		if (game.stage++ < 6)
 		{
 			// increase difficulty
 			game.numEnemies++;
@@ -637,6 +637,8 @@ void bombExplode(void)
 				tiles[i]->enemy->alive = false;			  
 				tiles[i]->enemy->tile->hasEnemy = false;
 				tiles[i]->enemy->tile->enemy = NULL;
+				game.player.score += 1;
+  			updateScore();
 			}
 		}		
 		
@@ -738,6 +740,18 @@ void loseLife(void)
 }
 
 /*--------------------------------------------------
+ *      Update Score - Chris Hughes
+ *--------------------------------------------------*/
+void updateScore()
+{
+	char outScore[3];
+
+	sprintf(outScore, "%2d",game.player.score);
+	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
+	GLCD_DrawString (96, 25, outScore);
+}
+
+/*--------------------------------------------------
  *      Draw char - Jack Dean
  *--------------------------------------------------*/
 void drawChar(int x, int y, int color)	
@@ -747,7 +761,7 @@ void drawChar(int x, int y, int color)
 }
 
 /*--------------------------------------------------
- *     Draw bitmap at pixels - Chris Hughes, Jack Dean
+ *     Draw bitmap - Chris Hughes, Jack Dean
  *--------------------------------------------------*/
 void drawBitmap(int x, int y, int width, int height, const unsigned char *bitmap)
 {
@@ -813,7 +827,8 @@ void drawUI(void)
 {
 	int lives;	
 	char str[] = "Lives: ";	
-	char livesStr[2];	
+	char livesStr[2];
+	char outScore[10];
 	
 	GLCD_SetForegroundColor (GLCD_COLOR_WHITE);	
 	GLCD_DrawRectangle (90, 110, 30, 60);		// right
@@ -829,7 +844,11 @@ void drawUI(void)
 		
 	// print lives info
 	GLCD_SetForegroundColor(GLCD_COLOR_WHITE);
-	GLCD_DrawString (0, 0, str);		;	
+	GLCD_DrawString (0, 0, str);
+	
+	//print score info
+ 	sprintf(outScore, "Score:%2d", game.player.score);
+ 	GLCD_DrawString (0, 25, outScore);
 }
 
 /*--------------------------------------------------
