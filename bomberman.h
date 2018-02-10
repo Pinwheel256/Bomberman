@@ -6,7 +6,7 @@
  * Modification History
  * 26-03-2016 Created
  *
- * Author: Jack Dean
+ * Author: Pinwheel256
  *--------------------------------------------------*/
 #ifndef _BOMBERMAN_H
 #define _BOMBERMAN_H
@@ -32,7 +32,7 @@
 #define T_SHORT 5                   /* Short delay */
 
 /*--------------------------------------------------
- *      Constants - Jack Dean
+ *      Constants - Pinwheel256
  *--------------------------------------------------*/
 #define GRID_X  130
 #define GRID_Y  0
@@ -49,7 +49,7 @@
 #define EXPLO_COL GLCD_COLOR_RED
 
 /*--------------------------------------------------
- *      Enum types and struct declarations - Jack Dean
+ *      Enum types and struct declarations - Pinwheel256
  *--------------------------------------------------*/
 
 typedef enum {SOLID, WEAK, FLOOR} tile_type;
@@ -108,7 +108,7 @@ typedef struct{
 } mail_t;
 
 /*--------------------------------------------------
- *      Function prototypes - Jack Dean
+ *      Function prototypes - Pinwheel256
  *--------------------------------------------------*/
 void startBomb(void);
 void startEnemies(void);
