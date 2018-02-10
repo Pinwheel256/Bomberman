@@ -6,7 +6,7 @@
  * Modification History
  * 26-03-2016 Created
  *
- * Author: Jack Dean, Chris Hughes
+ * Author: Pinwheel256, Chris Hughes
  *--------------------------------------------------*/
 
 #include "bomberman.h"
@@ -28,7 +28,7 @@ extern GLCD_FONT     GLCD_Font_16x24;
 Game game;
 
 /*--------------------------------------------------
- *      Initialise game - Jack Dean
+ *      Initialise game - Pinwheel256
  *---------------------------------------- ----------*/
 void initGame(void) 
 {							
@@ -42,7 +42,7 @@ void initGame(void)
 }
 
 /*--------------------------------------------------
- *      Show start screen - Jack Dean
+ *      Show start screen - Pinwheel256
  *---------------------------------------- ----------*/
 void showStartScreen(void) 
 {	
@@ -72,7 +72,7 @@ void showStartScreen(void)
 }
 
 /*--------------------------------------------------
- *      Initialise stage - Jack Dean
+ *      Initialise stage - Pinwheel256
  *--------------------------------------------------*/
 void initStage(void)
 {
@@ -161,7 +161,7 @@ void initStage(void)
 }
 
 /*--------------------------------------------------
- *      Show stage screen - Jack Dean
+ *      Show stage screen - Pinwheel256
  *---------------------------------------- ----------*/
 void showStageScreen(void) 
 {	
@@ -186,7 +186,7 @@ void showStageScreen(void)
 }
 
 /*--------------------------------------------------
- *      Place enemies - Jack Dean
+ *      Place enemies - Pinwheel256
  *--------------------------------------------------*/
 void placeEnemies(void)
 {
@@ -233,7 +233,7 @@ void placeEnemies(void)
 }
 
 /*--------------------------------------------------
- *      Place objects - Jack Dean
+ *      Place objects - Pinwheel256
  *--------------------------------------------------*/
 void placeObjects(void)
 {
@@ -268,7 +268,7 @@ void placeObjects(void)
 }	
 
 /*--------------------------------------------------
- *      Move player - Jack Dean
+ *      Move player - Pinwheel256
  *--------------------------------------------------*/
 void movePlayer(int i)
 {
@@ -340,7 +340,7 @@ void movePlayer(int i)
 }
 
 /*--------------------------------------------------
- *      Update player - Jack Dean
+ *      Update player - Pinwheel256
  *--------------------------------------------------*/
 void updatePlayer(Tile* tile, int xChange, int yChange)
 {	
@@ -396,7 +396,7 @@ void updatePlayer(Tile* tile, int xChange, int yChange)
 }
 
 /*--------------------------------------------------
- *      Move enemies - Jack Dean
+ *      Move enemies - Pinwheel256
  *--------------------------------------------------*/
 void moveEnemies(void)
 {
@@ -472,7 +472,7 @@ void moveEnemies(void)
 }
 
 /*--------------------------------------------------
- *      Update enemy - Jack Dean
+ *      Update enemy - Pinwheel256
  *--------------------------------------------------*/
 void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 {
@@ -502,7 +502,7 @@ void updateEnemy(Tile* tile, Enemy* enemy, int xChange, int yChange)
 }
 
 /*--------------------------------------------------
- *      Controls listener - Jack Dean
+ *      Controls listener - Pinwheel256
  *--------------------------------------------------*/
 void controls(void)
 {
@@ -557,7 +557,7 @@ void controls(void)
 }
 
 /*--------------------------------------------------
- *      Drop bomb - Jack Dean
+ *      Drop bomb - Pinwheel256
  *--------------------------------------------------*/
 void dropBomb(void)
 {
@@ -572,7 +572,7 @@ void dropBomb(void)
 }
 
 /*--------------------------------------------------
- *      Bomb Explode - Jack Dean
+ *      Bomb Explode - Pinwheel256
  *--------------------------------------------------*/
 void bombExplode(void)
 {
@@ -707,7 +707,7 @@ void bombExplode(void)
 }
 
 /*--------------------------------------------------
- *      Lose life - Jack Dean
+ *      Lose life - Pinwheel256
  *--------------------------------------------------*/
 void loseLife(void)
 {
@@ -752,7 +752,7 @@ void updateScore()
 }
 
 /*--------------------------------------------------
- *      Draw char - Jack Dean
+ *      Draw char - Pinwheel256
  *--------------------------------------------------*/
 void drawChar(int x, int y, int color)	
 {	
@@ -761,7 +761,7 @@ void drawChar(int x, int y, int color)
 }
 
 /*--------------------------------------------------
- *     Draw bitmap - Chris Hughes, Jack Dean
+ *     Draw bitmap - Chris Hughes, Pinwheel256
  *--------------------------------------------------*/
 void drawBitmap(int x, int y, int width, int height, const unsigned char *bitmap)
 {
@@ -821,7 +821,7 @@ unsigned int GLCD_RLE_Bitmap (unsigned int x, unsigned int y, unsigned int width
 }
 
 /*--------------------------------------------------
- *      Draw user interface - Jack Dean
+ *      Draw user interface - Pinwheel256
  *--------------------------------------------------*/
 void drawUI(void)
 {
@@ -852,7 +852,7 @@ void drawUI(void)
 }
 
 /*--------------------------------------------------
- *      Updates coords display (for testing) - Jack Dean
+ *      Updates coords display (for testing) - Pinwheel256
  *--------------------------------------------------*/
 void updateDisplay(TOUCH_STATE  *tsc_state) 
 {
@@ -867,7 +867,7 @@ void updateDisplay(TOUCH_STATE  *tsc_state)
 }
 
 /*--------------------------------------------------
- *      Clear coords display (for testing) - Jack Dean
+ *      Clear coords display (for testing) - Pinwheel256
  *--------------------------------------------------*/
 void clearDisplay() {
 //  GLCD_SetForegroundColor (GLCD_COLOR_WHITE);
@@ -876,7 +876,7 @@ void clearDisplay() {
 }
 
 /*--------------------------------------------------
- *      Player movement AI (for testing) - Jack Dean
+ *      Player movement AI (for testing) - Pinwheel256
  *--------------------------------------------------*/
 void playerAI(void)
 {
@@ -892,7 +892,7 @@ void playerAI(void)
 }
 
 /*--------------------------------------------------
- *      Check collision - Jack Dean
+ *      Check collision - Pinwheel256
  *--------------------------------------------------*/
 //bool checkCollision(void)		// not currently used
 //{
