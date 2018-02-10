@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    bomberman.c 
-  * @author  Jack Dean		
+  * @author  Pinwheel256		
   * @version V1.0.1
   * @date    26-03-2016
   * @brief   Simple version of Bomberman game.
@@ -143,7 +143,7 @@ osMutexDef(mut_GLCD);
 *       Signal Functions (must be in main file) 
 */
 /*--------------------------------------------------
- *      Signal bomb thread - Jack Dean
+ *      Signal bomb thread - Pinwheel256
  *--------------------------------------------------*/
 void startBomb()
 {			
@@ -166,7 +166,7 @@ void startControls()
 *
 */
 /*--------------------------------------------------
- *      Thread 1 'taskA': Initialisation task - Jack Dean
+ *      Thread 1 'taskA': Initialisation task - Pinwheel256
  *--------------------------------------------------*/
 void taskA (void const *argument) {
   for (;;) {
@@ -178,7 +178,7 @@ void taskA (void const *argument) {
 }
 
 /*--------------------------------------------------
- *      Thread 2 'taskB': Contols - Jack Dean
+ *      Thread 2 'taskB': Contols - Pinwheel256
  *--------------------------------------------------*/
 void taskB (void const *argument) {
   for (;;) {
@@ -188,7 +188,7 @@ void taskB (void const *argument) {
 }
 
 /*--------------------------------------------------
- *      Thread 3 'taskC': Enemy movement - Jack Dean
+ *      Thread 3 'taskC': Enemy movement - Pinwheel256
  *--------------------------------------------------*/
 
 void taskC (void const *argument) {
@@ -199,7 +199,7 @@ void taskC (void const *argument) {
 }
 
 /*--------------------------------------------------
- *      Thread 4 'taskD': Bomb - Jack Dean
+ *      Thread 4 'taskD': Bomb - Pinwheel256
  *--------------------------------------------------*/
 void taskD (void const *argument) {
   for (;;) {
